@@ -1,34 +1,78 @@
-HELP.md
+# ==============================
+# Maven
+# ==============================
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# ==============================
+# Java
+# ==============================
+*.class
+*.log
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# ==============================
+# IDE - IntelliJ IDEA
+# ==============================
+.idea/
 *.iml
+*.iws
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# ==============================
+# IDE - Eclipse
+# ==============================
+.classpath
+.project
+.settings/
 
-### VS Code ###
+# ==============================
+# IDE - VS Code
+# ==============================
 .vscode/
+
+# ==============================
+# Spring Boot
+# ==============================
+spring-boot-devtools.properties
+
+# ==============================
+# Environment / Secrets
+# ==============================
 .env
+.env.*
+!.env.example
+
+# ==============================
+# Application configuration with secrets
+# ==============================
+application-local.properties
+application-local.yml
+application-prod.properties
+application-prod.yml
+
+# ==============================
+# OS
+# ==============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================
+# Temporary files
+# ==============================
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# ==============================
+# Logs
+# ==============================
+logs/
+*.log
+
+# ==============================
+# Build files
+# ==============================
+*.jar
+*.war
