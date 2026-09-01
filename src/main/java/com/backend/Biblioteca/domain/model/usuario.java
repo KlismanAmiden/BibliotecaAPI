@@ -30,7 +30,7 @@ public class usuario {
     private String telefone;
 
     @Column(nullable = false)
-    private LocalDateTime data_cadastro;
+    private LocalDateTime dataCadastro;
 
     @Column(nullable = false)
     private boolean ativo;
