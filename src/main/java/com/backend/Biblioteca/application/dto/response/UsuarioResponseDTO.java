@@ -2,10 +2,10 @@ package com.backend.Biblioteca.application.dto.response;
 
 import java.time.LocalDateTime;
 
-public record usuarioResponseDTO(
+public record UsuarioResponseDTO(
 
         Long id,
-        String nombre,
+        String nome,
         String email,
         String telefone,
         LocalDateTime dataCadastro,

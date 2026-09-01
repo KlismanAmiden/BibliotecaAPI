@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
-public record usuarioRequestDTO(
+public record UsuarioRequestDTO(
 
         @NotBlank(message = "Nome é obrigatorio")
         String nome,

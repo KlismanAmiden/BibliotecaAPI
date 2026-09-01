@@ -1,39 +1,42 @@
 package com.backend.Biblioteca.application.service;
-import com.backend.Biblioteca.application.dto.request.usuarioRequestDTO;
-import com.backend.Biblioteca.application.dto.response.usuarioResponseDTO;
-import com.backend.Biblioteca.domain.model.usuario;
+import com.backend.Biblioteca.application.dto.request.UsuarioRequestDTO;
+import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
+import com.backend.Biblioteca.domain.model.Usuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.backend.Biblioteca.infrastructure.repository.usuarioRepository;
+import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class usuarioService {
+public class UsuarioService {
 
-    private final usuarioRepository repository;
+    private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public usuarioService(usuarioRepository repository, PasswordEncoder passwordEncoder){
+    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder){
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }
-    public List<usuarioResponseDTO> Listar(){
+    public List<UsuarioResponseDTO> Listar(){
         return repository.findAll().stream().map(this::toDTO).toList();
     }
-    public usuarioResponseDTO criar(usuarioRequestDTO dto){
+    public UsuarioResponseDTO criar(UsuarioRequestDTO dto){
         if(repository.existsByEmail(dto.email())){
             throw new RuntimeException("Email já cadastrado");
         }
-        usuario usuario = new usuario();
+        Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());
         usuario.setNome(dto.nome());
+        usuario.setTelefone(dto.telefone());
+        usuario.setDataCadastro(LocalDateTime.now());
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
-        usuario salvo = repository.save(usuario);
+        Usuario salvo = repository.save(usuario);
         return toDTO(salvo);
     }
-    private usuarioResponseDTO toDTO(usuario u){
-        return new usuarioResponseDTO(
+    private UsuarioResponseDTO toDTO(Usuario u){
+        return new UsuarioResponseDTO(
                 u.getId(),
                 u.getNome(),
                 u.getEmail(),
