@@ -17,22 +17,22 @@ public class usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name ="nome",nullable = false)
+    @Column(nullable = false)
     private String nome;
 
-    @Column(name ="nome",nullable = false,unique = true)
+    @Column(nullable = false,unique = true)
     private String email;
 
-    @Column(name = "senha", nullable = false)
+    @Column(nullable = false)
     private String senha;
 
-    @Column(name = "telefone", nullable = false)
+    @Column(nullable = false)
     private String telefone;
 
-    @Column(name = "data_cadastro",nullable = false)
+    @Column(nullable = false)
     private LocalDateTime data_cadastro;
 
-    @Column(name = "ativo",nullable = false)
+    @Column(nullable = false)
     private boolean ativo;
 
     
