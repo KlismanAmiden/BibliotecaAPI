@@ -1,4 +1,4 @@
-package com.backend.Biblioteca.web.controller.exception;
+package com.backend.Biblioteca.web.exception;
 
 public class BadRequestException extends RuntimeException {
     public BadRequestException(String message) {

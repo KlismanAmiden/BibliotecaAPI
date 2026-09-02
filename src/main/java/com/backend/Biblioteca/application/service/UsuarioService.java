@@ -2,6 +2,7 @@ package com.backend.Biblioteca.application.service;
 import com.backend.Biblioteca.application.dto.request.UsuarioRequestDTO;
 import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
 import com.backend.Biblioteca.domain.model.Usuario;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class UsuarioService {
     }
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto){
         if(repository.existsByEmail(dto.email())){
-            throw new RuntimeException("Email já cadastrado");
+            throw new BadRequestException("Email já cadastrado");
         }
         Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());

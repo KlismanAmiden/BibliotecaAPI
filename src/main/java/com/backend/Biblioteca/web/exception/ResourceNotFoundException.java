@@ -1,4 +1,4 @@
-package com.backend.Biblioteca.web.controller.exception;
+package com.backend.Biblioteca.web.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

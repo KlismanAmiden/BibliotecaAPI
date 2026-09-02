@@ -1,4 +1,4 @@
-package com.backend.Biblioteca.web.controller.exception;
+package com.backend.Biblioteca.web.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
