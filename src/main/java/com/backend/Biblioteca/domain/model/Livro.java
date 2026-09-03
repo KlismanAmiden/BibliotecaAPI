@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "Livros")
 @Getter
@@ -28,4 +30,8 @@ public class Livro {
 
     @Column(nullable = false)
     private String editora;
+
+    @ManyToMany(mappedBy = "livros")
+    private Set<Autrores> autores;
+
 }
