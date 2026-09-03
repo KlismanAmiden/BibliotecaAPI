@@ -2,12 +2,11 @@ package com.backend.Biblioteca.domain.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
 @Table(name = "Autores")
-public class Autrores {
+public class Autor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

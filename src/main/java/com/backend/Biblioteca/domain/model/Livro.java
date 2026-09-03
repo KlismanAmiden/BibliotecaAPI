@@ -32,6 +32,6 @@ public class Livro {
     private String editora;
 
     @ManyToMany(mappedBy = "livros")
-    private Set<Autrores> autores;
+    private Set<Autor> autores;
 
 }
