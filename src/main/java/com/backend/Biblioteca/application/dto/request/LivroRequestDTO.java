@@ -24,7 +24,10 @@ public record LivroRequestDTO(
         String editora,
 
         @NotBlank(message = "Autores é obrigatorio")
-        Set<Long>autoresIds
+        Set<Long>autoresIds,
+
+        @NotBlank(message = "Generos é obrigatorio")
+        Set<Long>generosIds
 
 ) {
 
