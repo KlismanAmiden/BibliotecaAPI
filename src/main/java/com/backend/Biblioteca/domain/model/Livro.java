@@ -34,4 +34,8 @@ public class Livro {
     @ManyToMany(mappedBy = "livros")
     private Set<Autor> autores;
 
+    @ManyToMany(mappedBy = "livros")
+    private Set<Genero> generos;
+
+
 }
