@@ -23,7 +23,7 @@ public class Livro {
     private String isbn;
 
     @Column(nullable = false)
-    private int AnoPublicado;
+    private int anoPublicado;
 
     @Column(nullable = false,columnDefinition = "TEXT")
     private String descricao;
