@@ -1,7 +1,9 @@
 package com.backend.Biblioteca.application.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
+import java.util.Set;
+
 
 public record LivroRequestDTO(
         @NotBlank(message = "Titulo é obrigatorio")
@@ -10,15 +12,19 @@ public record LivroRequestDTO(
         @NotBlank(message = "ISBN é obrigatorio")
         String isbn,
 
-        @NotBlank(message = "Ano é obrigatorio")
-        @Size(min = 4, max = 4, message = "Ano deve ter 4 digitos")
+        @Min(1000)
+        @Max(2026)
+        @NotNull
         Integer anoPublicado,
 
         @NotBlank(message = "descrição é obrigatorio")
         String descriao,
 
         @NotBlank(message = "Editora é obrigatorio")
-        String editora
+        String editora,
+
+        @NotBlank(message = "Autores é obrigatorio")
+        Set<Long>autoresIds
 
 ) {
 
