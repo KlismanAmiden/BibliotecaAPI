@@ -1,10 +1,15 @@
 package com.backend.Biblioteca.domain.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
 @Entity
+@Table(name = "Generos")
+@Getter
+@Setter
 public class Genero {
 
     @Id
@@ -17,11 +22,6 @@ public class Genero {
     @Column(nullable = false,columnDefinition = "TEXT")
     private String descricao;
 
-    @ManyToMany
-    @JoinTable(
-        name = "genero_livro",
-        joinColumns = @JoinColumn(name = "genero_id"),
-        inverseJoinColumns = @JoinColumn(name = "livro_id")
-    )
+    @ManyToMany(mappedBy = "generos")
     private Set<Livro> livros;
 }

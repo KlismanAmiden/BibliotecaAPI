@@ -9,7 +9,8 @@ public record LivroResponseDTO(
         Integer anoPublicado,
         String descricao,
         String editora,
-        Set<AutorResponseDTO> autores
+        Set<AutorResponseDTO> autores,
+        Set<GeneroResponseDTO> generos
 
 ) {
 }

@@ -31,10 +31,20 @@ public class Livro {
     @Column(nullable = false)
     private String editora;
 
-    @ManyToMany(mappedBy = "livros")
+    @ManyToMany
+    @JoinTable(
+            name = "livros_autores",
+            joinColumns = @JoinColumn(name = "livro_id"),
+            inverseJoinColumns = @JoinColumn(name = "autor_id")
+    )
     private Set<Autor> autores;
 
-    @ManyToMany(mappedBy = "livros")
+    @ManyToMany
+    @JoinTable(
+            name = "livros_generos",
+            joinColumns = @JoinColumn(name = "livro_id"),
+            inverseJoinColumns = @JoinColumn(name = "genero_id")
+    )
     private Set<Genero> generos;
 
 

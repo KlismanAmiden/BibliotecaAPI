@@ -7,7 +7,7 @@ import java.util.Set;
 
 public record LivroRequestDTO(
         @NotBlank(message = "Titulo é obrigatorio")
-        String ttulo,
+        String titulo,
 
         @NotBlank(message = "ISBN é obrigatorio")
         String isbn,
@@ -18,15 +18,15 @@ public record LivroRequestDTO(
         Integer anoPublicado,
 
         @NotBlank(message = "descrição é obrigatorio")
-        String descriao,
+        String descricao,
 
         @NotBlank(message = "Editora é obrigatorio")
         String editora,
 
-        @NotBlank(message = "Autores é obrigatorio")
+        @NotEmpty(message = "Autores é obrigatorio")
         Set<Long>autoresIds,
 
-        @NotBlank(message = "Generos é obrigatorio")
+        @NotEmpty(message = "Generos é obrigatorio")
         Set<Long>generosIds
 
 ) {
