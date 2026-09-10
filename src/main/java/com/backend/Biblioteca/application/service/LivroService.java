@@ -10,6 +10,7 @@ import com.backend.Biblioteca.domain.model.Livro;
 import com.backend.Biblioteca.infrastructure.repository.AutorRepository;
 import com.backend.Biblioteca.infrastructure.repository.GeneroRepository;
 import com.backend.Biblioteca.infrastructure.repository.LivroRepository;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,9 @@ public class LivroService {
     }
 
     public LivroResponseDTO criar(LivroRequestDTO dto){
+        if (repository.existsByIsbn(dto.isbn())) {
+            throw new BadRequestException("Livro já cadastrado com ISBN: " + dto.isbn());
+        }
 
         Set<Autor> autores = dto.autoresIds().stream()
                 .map(id -> autorRepository.findById(id)
