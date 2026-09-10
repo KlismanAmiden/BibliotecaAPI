@@ -22,6 +22,21 @@ public class LivroController {
         return service.listarTodos();
     }
 
+    @GetMapping("/genero/{generoId}")
+    public List<LivroResponseDTO> listarPorGenero(@PathVariable Long generoId) {
+        return service.listarPorGenero(generoId);
+    }
+
+    @GetMapping("/autor/{autorId}")
+    public List<LivroResponseDTO> listarPorAutor(@PathVariable Long autorId) {
+        return service.listarPorAutor(autorId);
+    }
+
+    @GetMapping("/{id}")
+    public LivroResponseDTO buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LivroResponseDTO criar(@Valid @RequestBody LivroRequestDTO dto) {
