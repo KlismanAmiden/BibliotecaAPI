@@ -87,6 +87,11 @@ public class LivroService {
         Livro atualizado = repository.save(livro);
         return toDTO(atualizado);
     }
+
+    public void deletar(Long id){
+        Livro livro = buscarPorEntidade(id);
+        repository.delete(livro);
+    }
     //-------------------------------Métodos auxiliares privados-----------------------------------------
 
     private Livro buscarPorEntidade(Long id) {

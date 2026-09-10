@@ -43,9 +43,14 @@ public class LivroController {
         return service.criar(dto);
     }
 
-
     @PutMapping("/{id}")
     public LivroResponseDTO atualizar (@PathVariable long id,@Valid @RequestBody LivroRequestDTO dto){
         return service.atualizar(id,dto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletar(@PathVariable Long id) {
+        service.deletar(id);
     }
 }
