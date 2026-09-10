@@ -115,7 +115,7 @@ public class LivroService {
         Set<AutorResponseDTO> autoresDTO = l.getAutores().stream()
                 .map(a -> new AutorResponseDTO(
                         a.getId(), a.getNome(), a.getBiografia(),
-                        a.getAnoNascimento(), a.getNacionalidade(), Set.of()))
+                        a.getAnoNascimento(), a.getNacionalidade()))
                 .collect(Collectors.toSet());
 
         Set<GeneroResponseDTO> generosDTO = l.getGeneros().stream()

@@ -47,7 +47,6 @@ public class AutorService {
         repository.delete(autor);
     }
 
-
     //-------------------------------Métodos auxiliares privados-----------------------------------------
 
     private Autor buscarPorEntidade(Long id) {
