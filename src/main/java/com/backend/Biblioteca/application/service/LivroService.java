@@ -38,6 +38,12 @@ public class LivroService {
         return repository.findByAutoresId(autorId).stream().map(this::toDTO).toList();
     }
 
+    public LivroResponseDTO buscarPorId(Long id){
+        Livro livro = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado com id: " + id));
+        return toDTO(livro);
+    }
+
     public LivroResponseDTO criar(LivroRequestDTO dto){
 
         Set<Autor> autores = dto.autoresIds().stream()
