@@ -20,6 +20,7 @@ public class UsuarioController {
     public List<UsuarioResponseDTO> listar() {
         return service.Listar();
     }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponseDTO criar (@Valid @RequestBody UsuarioRequestDTO dto) {
