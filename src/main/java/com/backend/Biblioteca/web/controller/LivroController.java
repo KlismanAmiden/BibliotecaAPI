@@ -43,4 +43,9 @@ public class LivroController {
         return service.criar(dto);
     }
 
+
+    @PutMapping("/{id}")
+    public LivroResponseDTO atualizar (@PathVariable long id,@Valid @RequestBody LivroRequestDTO dto){
+        return service.atualizar(id,dto);
+    }
 }

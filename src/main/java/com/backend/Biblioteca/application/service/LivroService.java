@@ -65,6 +65,28 @@ public class LivroService {
         Livro salvo = repository.save(livro);
         return toDTO(salvo);
     }
+
+    public LivroResponseDTO atualizar(Long id, LivroRequestDTO dto) {
+        Livro livro = buscarPorEntidade(id);
+
+        if (!livro.getIsbn().equals(dto.isbn()) && repository.existsByIsbn(dto.isbn())) {
+            throw new BadRequestException("Já existe um livro cadastrado com o ISBN: " + dto.isbn());
+        }
+
+        Set<Autor> autores = buscarAutores(dto.autoresIds());
+        Set<Genero> generos = buscarGeneros(dto.generosIds());
+
+        livro.setTitulo(dto.titulo());
+        livro.setIsbn(dto.isbn());
+        livro.setAnoPublicado(dto.anoPublicado());
+        livro.setDescricao(dto.descricao());
+        livro.setEditora(dto.editora());
+        livro.setAutores(autores);
+        livro.setGeneros(generos);
+
+        Livro atualizado = repository.save(livro);
+        return toDTO(atualizado);
+    }
     //-------------------------------Métodos auxiliares privados-----------------------------------------
 
     private Livro buscarPorEntidade(Long id) {
