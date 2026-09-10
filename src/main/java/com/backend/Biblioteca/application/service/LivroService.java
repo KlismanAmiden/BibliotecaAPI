@@ -40,8 +40,7 @@ public class LivroService {
     }
 
     public LivroResponseDTO buscarPorId(Long id){
-        Livro livro = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado com id: " + id));
+        Livro livro = buscarPorEntidade(id);
         return toDTO(livro);
     }
 

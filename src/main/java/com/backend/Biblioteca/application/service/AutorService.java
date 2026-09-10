@@ -30,6 +30,11 @@ public class AutorService {
         return toDTO(salvo);
     }
 
+    public AutorResponseDTO listarPorId(Long id){
+        Autor autor = buscarPorEntidade(id);
+        return toDTO(autor);
+    }
+
     public AutorResponseDTO atualizar(Long id, AutorRequestDTO dto){
         Autor autor = buscarPorEntidade(id);
 
