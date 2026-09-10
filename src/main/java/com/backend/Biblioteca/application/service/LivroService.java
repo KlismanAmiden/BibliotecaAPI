@@ -34,6 +34,9 @@ public class LivroService {
         return repository.findByGenerosId(generoId).stream().map(this::toDTO).toList();
     }
 
+    public List<LivroResponseDTO> listarPorAutor(Long autorId){
+        return repository.findByAutoresId(autorId).stream().map(this::toDTO).toList();
+    }
 
     public LivroResponseDTO criar(LivroRequestDTO dto){
 
