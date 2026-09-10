@@ -10,6 +10,7 @@ public record AutorRequestDTO(
         @NotBlank(message = "Nome é obrigatorio")
         String nome,
 
+        @NotBlank(message = "Biografia é obrigatória")
         String biografia,
 
         @Min(1000)

@@ -3,6 +3,7 @@ import com.backend.Biblioteca.application.dto.request.UsuarioRequestDTO;
 import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
 import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.web.exception.BadRequestException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -11,15 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder){
-        this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
-    }
     public List<UsuarioResponseDTO> Listar(){
         return repository.findAll().stream().map(this::toDTO).toList();
     }
@@ -36,6 +34,9 @@ public class UsuarioService {
         Usuario salvo = repository.save(usuario);
         return toDTO(salvo);
     }
+
+    //-------------------------------Métodos auxiliares privados-----------------------------------------
+
     private UsuarioResponseDTO toDTO(Usuario u){
         return new UsuarioResponseDTO(
                 u.getId(),
