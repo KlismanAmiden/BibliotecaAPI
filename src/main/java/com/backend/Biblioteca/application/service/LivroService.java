@@ -30,6 +30,11 @@ public class LivroService {
         return repository.findAll().stream().map(this::toDTO).toList();
     }
 
+    public List<LivroResponseDTO> listarPorGenero(Long generoId){
+        return repository.findByGenerosId(generoId).stream().map(this::toDTO).toList();
+    }
+
+
     public LivroResponseDTO criar(LivroRequestDTO dto){
 
         Set<Autor> autores = dto.autoresIds().stream()
