@@ -50,15 +50,8 @@ public class LivroService {
             throw new BadRequestException("Livro já cadastrado com ISBN: " + dto.isbn());
         }
 
-        Set<Autor> autores = dto.autoresIds().stream()
-                .map(id -> autorRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado com id: " + id)))
-                .collect(Collectors.toSet());
-
-        Set<Genero> generos = dto.generosIds().stream()
-                .map(id -> generoRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Genero não encontrado com id: " + id)))
-                .collect(Collectors.toSet());
+        Set<Autor> autores = buscarAutores(dto.autoresIds());
+        Set<Genero> generos = buscarGeneros(dto.generosIds());
 
         Livro livro = new Livro();
         livro.setTitulo(dto.titulo());
@@ -71,6 +64,24 @@ public class LivroService {
 
         Livro salvo = repository.save(livro);
         return toDTO(salvo);
+    }
+    //-------------------------------Métodos auxiliares privados-----------------------------------------
+
+    private Livro buscarPorEntidade(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado com id: " + id));
+    }
+    private Set<Autor> buscarAutores(Set<Long> ids) {
+        return ids.stream()
+                .map(id -> autorRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado com id: " + id)))
+                .collect(Collectors.toSet());
+    }
+    private Set<Genero> buscarGeneros(Set<Long> ids) {
+        return ids.stream()
+                .map(id -> generoRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Genero não encontrado com id: " + id)))
+                .collect(Collectors.toSet());
     }
 
     private LivroResponseDTO toDTO(Livro l) {
