@@ -10,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,6 +55,21 @@ public class GeneroServiceTest {
 
         assertTrue(resultado.isEmpty());
         verify(repository).findAll();
+    }
+    @Test
+    void deveListarGeneroPorIdComSucesso() {
+        Genero genero = criarGenero(1L, "Ficção Científica", "Livros de ficção científica");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(genero));
+
+        GeneroResponseDTO resultado = service.listarPorId(1L);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.id());
+        assertEquals("Ficção Científica", resultado.nome());
+        assertEquals("Livros de ficção científica", resultado.descricao());
+
+        verify(repository).findById(1L);
     }
 
 }
