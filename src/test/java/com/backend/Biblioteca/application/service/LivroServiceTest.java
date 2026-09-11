@@ -93,11 +93,25 @@ public class LivroServiceTest {
         Livro livro = criarLivro(1L, "Fundação", "978-0553293357", autor, genero);
 
         when(repository.findByAutoresId(autor.getId())).thenReturn(List.of(livro));
-        List<LivroResponseDTO> resultado = service.listarPorAutor(autor.getId());
+        List<LivroResponseDTO> resultado = service.listarPorAutor(1L);
 
         assertEquals(1, resultado.size());
         assertEquals("Fundação",resultado.get(0).titulo());
         verify(repository).findByAutoresId(autor.getId());
     }
+    @Test
+    void deveListarLivroPorGenero(){
+        Autor autor = criarAutor(1L, "Isaac Asimov");
+        Genero genero = criarGenero(1L, "Ficção Científica");
+        Livro livro = criarLivro(1L, "Fundação", "978-0553293357", autor, genero);
+
+        when(repository.findByGenerosId(genero.getId())).thenReturn(List.of(livro));
+        List<LivroResponseDTO> resultado = service.listarPorGenero(1L);
+
+        assertEquals(1, resultado.size());
+        assertEquals("Fundação",resultado.get(0).titulo());
+        verify(repository).findByGenerosId(genero.getId());
+    }
+
 
 }
