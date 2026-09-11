@@ -215,4 +215,25 @@ public class LivroServiceTest {
         assertEquals("Genero não encontrado com id: 99", exception.getMessage());
         verify(repository, never()).save(any());
     }
+
+    @Test
+    void deveAtualizarLivroComSucesso(){
+        Autor autor = criarAutor(1L, "Isaac Asimov");
+        Genero genero = criarGenero(1L, "Ficção Científica");
+        Livro existente = criarLivro(1L, "Fundação", "978-0553293357", autor, genero);
+
+        LivroRequestDTO dto = criarDto("978-0553293357", Set.of(1L), Set.of(1L));
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(autorRepository.findById(1L)).thenReturn(Optional.of(autor));
+        when(generoRepository.findById(1L)).thenReturn(Optional.of(genero));
+        when(repository.save(any(Livro.class))).thenReturn(existente);
+
+        LivroResponseDTO response = service.atualizar(1L,dto);
+
+        assertEquals("Fundação",response.titulo());
+        verify(repository).findById(1L);
+        verify(repository).save(existente);
+        verify(repository, never()).existsByIsbn(any());
+    }
 }
