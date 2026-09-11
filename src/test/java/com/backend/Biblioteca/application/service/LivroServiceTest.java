@@ -181,4 +181,21 @@ public class LivroServiceTest {
         verify(repository, never()).save(any());
     }
 
+    @Test
+    void deveLancarExcecaoQuandoAutorNaoEncontradoAoCriar() {
+        LivroRequestDTO dto = criarDto("978-0553293357", Set.of(99L), Set.of(1L));
+
+        when(repository.existsByIsbn(dto.isbn())).thenReturn(false);
+        when(autorRepository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Autor não encontrado com id: 99", exception.getMessage());
+        verifyNoInteractions(generoRepository);
+        verify(repository, never()).save(any());
+    }
+
 }
