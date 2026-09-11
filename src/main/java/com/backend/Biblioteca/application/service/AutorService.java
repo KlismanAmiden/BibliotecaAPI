@@ -19,6 +19,7 @@ public class AutorService {
     public List<AutorResponseDTO> listarTodos(){
         return repository.findAll().stream().map(this::toDTO).toList();
     }
+
     public AutorResponseDTO criar(AutorRequestDTO dto){
 
         Autor autor = new Autor();
