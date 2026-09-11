@@ -236,4 +236,24 @@ public class LivroServiceTest {
         verify(repository).save(existente);
         verify(repository, never()).existsByIsbn(any());
     }
+
+    @Test
+    void deveValidarISBNDuplicadoAoAtualizarParaOutroISBN(){
+        Autor autor = criarAutor(1L, "Isaac Asimov");
+        Genero genero = criarGenero(1L, "Ficção Científica");
+        Livro existente = criarLivro(1L, "Fundação", "978-0553293357", autor, genero);
+
+        LivroRequestDTO dto = criarDto("978-1111111111", Set.of(1L), Set.of(1L));
+
+        when(repository.existsByIsbn("978-1111111111")).thenReturn(true);
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.atualizar(1L, dto));
+
+        assertEquals("Já existe um livro cadastrado com o ISBN: 978-1111111111", exception.getMessage());
+        verify(repository, never()).save(any());
+    }
 }
