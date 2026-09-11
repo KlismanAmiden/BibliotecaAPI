@@ -8,6 +8,7 @@ import com.backend.Biblioteca.domain.model.Livro;
 import com.backend.Biblioteca.infrastructure.repository.AutorRepository;
 import com.backend.Biblioteca.infrastructure.repository.GeneroRepository;
 import com.backend.Biblioteca.infrastructure.repository.LivroRepository;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -126,6 +128,14 @@ public class LivroServiceTest {
         assertEquals("Fundação", resultado.titulo());
         verify(repository).findById(1L);
     }
-
+    @Test
+    void deveLancarExcecaoQuandoLivroNaoEncontrado(){
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.buscarPorId(99L)
+        );
+        assertEquals("Livro não encontrado com id: 99", exception.getMessage());
+    }
 
 }
