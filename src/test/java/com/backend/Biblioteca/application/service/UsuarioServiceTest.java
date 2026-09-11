@@ -103,7 +103,7 @@ public class UsuarioServiceTest {
         when(repository.findAll())
                 .thenReturn(List.of(usuario1, usuario2));
 
-        List<UsuarioResponseDTO> response = usuarioService.Listar();
+        List<UsuarioResponseDTO> response = usuarioService.ListarTodos();
 
         assertNotNull(response);
         assertEquals(2, response.size());
