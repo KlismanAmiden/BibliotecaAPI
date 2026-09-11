@@ -279,4 +279,12 @@ public class LivroServiceTest {
         verify(repository).findById(1L);
         verify(repository).delete(livro);
     }
+    @Test
+    void deveLancarExcecaoQuandoLivroNaoEncontradoAoDeletar() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.deletar(99L));
+        verify(repository, never()).delete(any());
+    }
 }
+
