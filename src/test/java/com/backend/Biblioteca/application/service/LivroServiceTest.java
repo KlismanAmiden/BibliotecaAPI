@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -111,6 +112,19 @@ public class LivroServiceTest {
         assertEquals(1, resultado.size());
         assertEquals("Fundação",resultado.get(0).titulo());
         verify(repository).findByGenerosId(genero.getId());
+    }
+    @Test
+    void deveListarLivroPorId() {
+        Autor autor = criarAutor(1L, "Isaac Asimov");
+        Genero genero = criarGenero(1L, "Ficção Científica");
+        Livro livro = criarLivro(1L, "Fundação", "978-0553293357", autor, genero);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(livro));
+
+        LivroResponseDTO resultado = service.buscarPorId(1L);
+
+        assertEquals("Fundação", resultado.titulo());
+        verify(repository).findById(1L);
     }
 
 
