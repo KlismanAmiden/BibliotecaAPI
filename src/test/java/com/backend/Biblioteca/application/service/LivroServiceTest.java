@@ -8,6 +8,7 @@ import com.backend.Biblioteca.domain.model.Livro;
 import com.backend.Biblioteca.infrastructure.repository.AutorRepository;
 import com.backend.Biblioteca.infrastructure.repository.GeneroRepository;
 import com.backend.Biblioteca.infrastructure.repository.LivroRepository;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +23,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LivroServiceTest {
@@ -165,6 +165,20 @@ public class LivroServiceTest {
 
         verify(repository).existsByIsbn(dto.isbn());
         verify(repository).save(any(Livro.class));
+    }
+    @Test
+    void deveLancarExcecaoQuandoISBNJaExisteAoCriar(){
+        LivroRequestDTO dto = criarDto("978-0553293357", Set.of(1L, 2L), Set.of(1L));
+
+        when(repository.existsByIsbn(dto.isbn())).thenReturn(true);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto));
+
+        assertEquals("Livro já cadastrado com ISBN: 978-0553293357",exception.getMessage());
+        verifyNoInteractions(autorRepository,generoRepository);
+        verify(repository, never()).save(any());
     }
 
 }
