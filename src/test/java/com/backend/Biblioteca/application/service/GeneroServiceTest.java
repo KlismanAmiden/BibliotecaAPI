@@ -3,6 +3,7 @@ package com.backend.Biblioteca.application.service;
 import com.backend.Biblioteca.application.dto.response.GeneroResponseDTO;
 import com.backend.Biblioteca.domain.model.Genero;
 import com.backend.Biblioteca.infrastructure.repository.GeneroRepository;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -70,6 +71,18 @@ public class GeneroServiceTest {
         assertEquals("Livros de ficção científica", resultado.descricao());
 
         verify(repository).findById(1L);
+    }
+    @Test
+    void deveLancarExcecaoQuandoGeneroNaoEncontradoPorId() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.listarPorId(99L)
+        );
+
+        assertEquals("Genero não encontrado com id: 99", exception.getMessage());
+        verify(repository).findById(99L);
     }
 
 }
