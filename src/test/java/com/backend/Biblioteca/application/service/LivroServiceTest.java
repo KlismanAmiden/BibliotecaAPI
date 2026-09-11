@@ -256,4 +256,13 @@ public class LivroServiceTest {
         assertEquals("Já existe um livro cadastrado com o ISBN: 978-1111111111", exception.getMessage());
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoLivroNaoEncontradoAoAtualizar(){
+        LivroRequestDTO dto = criarDto("978-0553293357", Set.of(1L), Set.of(1L));
+
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.atualizar(99L, dto));
+        verify(repository, never()).save(any());
+    }
 }
