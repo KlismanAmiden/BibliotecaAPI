@@ -265,4 +265,18 @@ public class LivroServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> service.atualizar(99L, dto));
         verify(repository, never()).save(any());
     }
+
+    @Test
+    void deveDeletarLivroComSucesso() {
+        Autor autor = criarAutor(1L, "Isaac Asimov");
+        Genero genero = criarGenero(1L, "Ficção Científica");
+        Livro livro = criarLivro(1L, "Fundação", "978-0553293357", autor, genero);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(livro));
+
+        service.deletar(1L);
+
+        verify(repository).findById(1L);
+        verify(repository).delete(livro);
+    }
 }
