@@ -1,5 +1,6 @@
 package com.backend.Biblioteca.application.service;
 
+import com.backend.Biblioteca.application.dto.request.GeneroRequestDTO;
 import com.backend.Biblioteca.application.dto.response.GeneroResponseDTO;
 import com.backend.Biblioteca.domain.model.Genero;
 import com.backend.Biblioteca.infrastructure.repository.GeneroRepository;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -84,5 +87,28 @@ public class GeneroServiceTest {
         assertEquals("Genero não encontrado com id: 99", exception.getMessage());
         verify(repository).findById(99L);
     }
+    @Test
+    void deveCriarGeneroComSucesso() {
+        GeneroRequestDTO dto = new GeneroRequestDTO("Ficção Científica", "Livros de ficção científica");
 
+        when(repository.existsByNome(dto.nome())).thenReturn(false);
+        when(repository.save(any(Genero.class))).thenAnswer(invocation -> {
+            Genero generoSalvo = invocation.getArgument(0);
+            generoSalvo.setId(1L);
+            return generoSalvo;
+        });
+
+        GeneroResponseDTO resultado = service.criar(dto);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.id());
+        assertEquals("Ficção Científica", resultado.nome());
+        assertEquals("Livros de ficção científica", resultado.descricao());
+
+        verify(repository).existsByNome(dto.nome());
+        verify(repository).save(argThat(g ->
+                g.getNome().equals(dto.nome()) &&
+                        g.getDescricao().equals(dto.descricao())
+        ));
+    }
 }
