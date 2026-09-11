@@ -19,8 +19,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -136,6 +137,34 @@ public class LivroServiceTest {
                 () -> service.buscarPorId(99L)
         );
         assertEquals("Livro não encontrado com id: 99", exception.getMessage());
+    }
+    @Test
+    void deveCriarLivroComSucesso() {
+        Autor autor1 = criarAutor(1L, "Isaac Asimov");
+        Autor autor2 = criarAutor(2L, "Robert Silverberg");
+        Genero genero = criarGenero(1L, "Ficção Científica");
+
+        LivroRequestDTO dto = criarDto("978-0553293357", Set.of(1L, 2L), Set.of(1L));
+
+        when(repository.existsByIsbn(dto.isbn())).thenReturn(false);
+        when(autorRepository.findById(1L)).thenReturn(Optional.of(autor1));
+        when(autorRepository.findById(2L)).thenReturn(Optional.of(autor2));
+        when(generoRepository.findById(1L)).thenReturn(Optional.of(genero));
+        when(repository.save(any(Livro.class))).thenAnswer(invocation -> {
+            Livro livroSalvo = invocation.getArgument(0);
+            livroSalvo.setId(10L);
+            return livroSalvo;
+        });
+
+        LivroResponseDTO response = service.criar(dto);
+
+        assertNotNull(response);
+        assertEquals(10L,response.id());
+        assertEquals(2,response.autores().size());
+        assertEquals(1,response.generos().size());
+
+        verify(repository).existsByIsbn(dto.isbn());
+        verify(repository).save(any(Livro.class));
     }
 
 }
