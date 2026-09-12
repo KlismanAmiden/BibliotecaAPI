@@ -101,4 +101,18 @@ public class ExemplarServiceTest {
         assertEquals("Exemplar não encontrado com id: 99", exception.getMessage());
         verify(repository).findById(99L);
     }
+    @Test
+    void deveListarExemplaresPorLivroComSucesso() {
+        Livro livro = criarLivro(1L, "Fundação");
+        Exemplar exemplar1 = criarExemplar(1L, livro, StatusExemplar.DISPONIVEL);
+        Exemplar exemplar2 = criarExemplar(2L, livro, StatusExemplar.INDISPONIVEL);
+
+        when(repository.findByLivroId(1L)).thenReturn(List.of(exemplar1, exemplar2));
+
+        List<ExemplarResponseDTO> resultado = service.listarPorLivro(1L);
+
+        assertEquals(2, resultado.size());
+        verify(repository).findByLivroId(1L);
+    }
+
 }
