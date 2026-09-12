@@ -1,5 +1,6 @@
 package com.backend.Biblioteca.application.service;
 
+import com.backend.Biblioteca.application.dto.request.ExemplarRequestDTO;
 import com.backend.Biblioteca.application.dto.response.ExemplarResponseDTO;
 import com.backend.Biblioteca.domain.enums.StatusExemplar;
 import com.backend.Biblioteca.domain.model.Exemplar;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -113,6 +116,31 @@ public class ExemplarServiceTest {
 
         assertEquals(2, resultado.size());
         verify(repository).findByLivroId(1L);
+    }
+    @Test
+    void deveCriarExemplarComSucesso() {
+        Livro livro = criarLivro(1L, "Fundação");
+        ExemplarRequestDTO dto = new ExemplarRequestDTO(1L);
+
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(repository.save(any(Exemplar.class))).thenAnswer(invocation -> {
+            Exemplar exemplarSalvo = invocation.getArgument(0);
+            exemplarSalvo.setId(10L);
+            return exemplarSalvo;
+        });
+
+        ExemplarResponseDTO resultado = service.criar(dto);
+
+        assertNotNull(resultado);
+        assertEquals(10L, resultado.id());
+        assertEquals(1L, resultado.livroId());
+        assertEquals(StatusExemplar.DISPONIVEL, resultado.status());
+
+        verify(livroRepository).findById(1L);
+        verify(repository).save(argThat(e ->
+                e.getLivro().equals(livro) &&
+                        e.getStatus() == StatusExemplar.DISPONIVEL
+        ));
     }
 
 }
