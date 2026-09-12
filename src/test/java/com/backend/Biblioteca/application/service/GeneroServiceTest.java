@@ -159,4 +159,22 @@ public class GeneroServiceTest {
         verify(repository).existsByNome("Ficção");
         verify(repository).save(existente);
     }
+
+    @Test
+    void deveLancarExcecaoQuandoNomeJaExisteAoAtualizarParaOutroNome() {
+        Genero existente = criarGenero(1L, "Ficção Científica", "Descrição antiga");
+        GeneroRequestDTO dto = new GeneroRequestDTO("Fantasia", "Descrição nova");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(repository.existsByNome("Fantasia")).thenReturn(true);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.atualizar(1L, dto)
+        );
+
+        assertEquals("Já existe um genero cadastrado com o Nome: Fantasia", exception.getMessage());
+
+        verify(repository, never()).save(any());
+    }
 }
