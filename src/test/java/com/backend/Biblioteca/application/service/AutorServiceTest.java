@@ -10,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,5 +57,23 @@ public class AutorServiceTest {
 
         assertTrue(resultado.isEmpty());
         verify(repository).findAll();
+    }
+
+    @Test
+    void deveListarAutorPorIdComSucesso() {
+        Autor autor = criarAutor(1L, "Isaac Asimov", "Escritor de ficção científica", 1920, "Americana");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(autor));
+
+        AutorResponseDTO resultado = service.listarPorId(1L);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.id());
+        assertEquals("Isaac Asimov", resultado.nome());
+        assertEquals("Escritor de ficção científica", resultado.biografia());
+        assertEquals(1920, resultado.anoNascimento());
+        assertEquals("Americana", resultado.nacionalidade());
+
+        verify(repository).findById(1L);
     }
 }
