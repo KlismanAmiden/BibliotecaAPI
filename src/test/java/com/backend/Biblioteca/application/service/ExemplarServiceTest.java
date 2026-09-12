@@ -182,4 +182,16 @@ public class ExemplarServiceTest {
         verify(repository, never()).save(any());
     }
 
+    @Test
+    void deveDeletarExemplarComSucesso() {
+        Livro livro = criarLivro(1L, "Fundação");
+        Exemplar exemplar = criarExemplar(1L, livro, StatusExemplar.DISPONIVEL);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(exemplar));
+
+        service.deletar(1L);
+
+        verify(repository).findById(1L);
+        verify(repository).delete(exemplar);
+    }
 }
