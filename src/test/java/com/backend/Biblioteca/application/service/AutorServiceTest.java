@@ -18,8 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AutorServiceTest {
@@ -138,4 +137,17 @@ public class AutorServiceTest {
         verify(repository).findById(1L);
         verify(repository).save(existente);
     }
+    @Test
+    void deveLancarExcecaoQuandoAutorNaoEncontradoAoAtualizar() {
+        AutorRequestDTO dto = new AutorRequestDTO(
+                "Isaac Asimov", "Bio atualizada", 1920, "Americana"
+        );
+
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.atualizar(99L, dto));
+
+        verify(repository, never()).save(any());
+    }
+
 }
