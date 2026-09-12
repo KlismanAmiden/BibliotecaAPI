@@ -199,4 +199,12 @@ public class GeneroServiceTest {
         verify(repository).findById(1L);
         verify(repository).delete(genero);
     }
+    @Test
+    void deveLancarExcecaoQuandoGeneroNaoEncontradoAoDeletar() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.deletar(99L));
+
+        verify(repository, never()).delete(any());
+    }
 }
