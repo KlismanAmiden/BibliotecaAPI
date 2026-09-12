@@ -149,5 +149,16 @@ public class AutorServiceTest {
 
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveDeletarAutorComSucesso() {
+        Autor autor = criarAutor(1L, "Isaac Asimov", "Escritor de ficção científica", 1920, "Americana");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(autor));
+
+        service.deletar(1L);
+
+        verify(repository).findById(1L);
+        verify(repository).delete(autor);
+    }
 
 }
