@@ -6,6 +6,7 @@ import com.backend.Biblioteca.domain.model.Exemplar;
 import com.backend.Biblioteca.domain.model.Livro;
 import com.backend.Biblioteca.infrastructure.repository.ExemplarRepository;
 import com.backend.Biblioteca.infrastructure.repository.LivroRepository;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -88,4 +89,16 @@ public class ExemplarServiceTest {
         verify(repository).findById(1L);
     }
 
+    @Test
+    void deveLancarExcecaoQuandoExemplarNaoEncontradoPorId() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.listarPorId(99L)
+        );
+
+        assertEquals("Exemplar não encontrado com id: 99", exception.getMessage());
+        verify(repository).findById(99L);
+    }
 }
