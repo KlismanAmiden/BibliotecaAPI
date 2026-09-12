@@ -20,8 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ExemplarServiceTest {
@@ -142,5 +141,22 @@ public class ExemplarServiceTest {
                         e.getStatus() == StatusExemplar.DISPONIVEL
         ));
     }
+    @Test
+    void deveLancarExcecaoQuandoLivroNaoEncontradoAoCriar() {
+        ExemplarRequestDTO dto = new ExemplarRequestDTO(99L);
+
+        when(livroRepository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Livro não encontrado com id: 99", exception.getMessage());
+
+        verify(livroRepository).findById(99L);
+        verify(repository, never()).save(any());
+    }
+
 
 }
