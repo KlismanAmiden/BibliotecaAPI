@@ -1,14 +1,22 @@
 package com.backend.Biblioteca.application.service;
 
+import com.backend.Biblioteca.application.dto.response.ExemplarResponseDTO;
 import com.backend.Biblioteca.domain.enums.StatusExemplar;
 import com.backend.Biblioteca.domain.model.Exemplar;
 import com.backend.Biblioteca.domain.model.Livro;
 import com.backend.Biblioteca.infrastructure.repository.ExemplarRepository;
 import com.backend.Biblioteca.infrastructure.repository.LivroRepository;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ExemplarServiceTest {
@@ -35,5 +43,21 @@ public class ExemplarServiceTest {
         exemplar.setLivro(livro);
         exemplar.setStatus(status);
         return exemplar;
+    }
+    @Test
+    void deveListarExemplaresComSucesso() {
+        Livro livro = criarLivro(1L, "Fundação");
+        Exemplar exemplar1 = criarExemplar(1L, livro, StatusExemplar.DISPONIVEL);
+        Exemplar exemplar2 = criarExemplar(2L, livro, StatusExemplar.EMPRESTADO);
+
+        when(repository.findAll()).thenReturn(List.of(exemplar1, exemplar2));
+
+        List<ExemplarResponseDTO> resultado = service.listarTodos();
+
+        assertEquals(2, resultado.size());
+        assertEquals(StatusExemplar.DISPONIVEL, resultado.get(0).status());
+        assertEquals(StatusExemplar.EMPRESTADO, resultado.get(1).status());
+
+        verify(repository).findAll();
     }
 }
