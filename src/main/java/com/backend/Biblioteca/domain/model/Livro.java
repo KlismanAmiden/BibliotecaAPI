@@ -34,7 +34,7 @@ public class Livro {
     @ManyToMany
     @JoinTable(
             name = "livros_autores",
-            joinColumns = @JoinColumn(name = "livro_id"),
+            joinColumns = @JoinColumn(name = "livroId"),
             inverseJoinColumns = @JoinColumn(name = "autor_id")
     )
     private Set<Autor> autores;
@@ -42,7 +42,7 @@ public class Livro {
     @ManyToMany
     @JoinTable(
             name = "livros_generos",
-            joinColumns = @JoinColumn(name = "livro_id"),
+            joinColumns = @JoinColumn(name = "livroId"),
             inverseJoinColumns = @JoinColumn(name = "genero_id")
     )
     private Set<Genero> generos;

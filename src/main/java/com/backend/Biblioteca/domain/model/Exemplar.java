@@ -16,7 +16,7 @@ public class Exemplar {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "livro_id",nullable = false)
+    @JoinColumn(name = "livroId",nullable = false)
     private Livro livro;
 
     @Enumerated(EnumType.STRING)

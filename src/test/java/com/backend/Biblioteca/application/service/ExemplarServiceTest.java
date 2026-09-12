@@ -13,9 +13,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,6 +69,23 @@ public class ExemplarServiceTest {
 
         assertTrue(resultado.isEmpty());
         verify(repository).findAll();
+    }
+
+    @Test
+    void deveListarExemplarPorIdComSucesso() {
+        Livro livro = criarLivro(1L, "Fundação");
+        Exemplar exemplar = criarExemplar(1L, livro, StatusExemplar.DISPONIVEL);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(exemplar));
+
+        ExemplarResponseDTO resultado = service.listarPorId(1L);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.id());
+        assertEquals(1L, resultado.livroId());
+        assertEquals(StatusExemplar.DISPONIVEL, resultado.status());
+
+        verify(repository).findById(1L);
     }
 
 }
