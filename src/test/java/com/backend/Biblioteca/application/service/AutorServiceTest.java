@@ -3,6 +3,7 @@ package com.backend.Biblioteca.application.service;
 import com.backend.Biblioteca.application.dto.response.AutorResponseDTO;
 import com.backend.Biblioteca.domain.model.Autor;
 import com.backend.Biblioteca.infrastructure.repository.AutorRepository;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -58,7 +59,6 @@ public class AutorServiceTest {
         assertTrue(resultado.isEmpty());
         verify(repository).findAll();
     }
-
     @Test
     void deveListarAutorPorIdComSucesso() {
         Autor autor = criarAutor(1L, "Isaac Asimov", "Escritor de ficção científica", 1920, "Americana");
@@ -75,5 +75,17 @@ public class AutorServiceTest {
         assertEquals("Americana", resultado.nacionalidade());
 
         verify(repository).findById(1L);
+    }
+    @Test
+    void deveLancarExcecaoQuandoAutorNaoEncontradoPorId() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.listarPorId(99L)
+        );
+
+        assertEquals("Autor não encontrado com id: 99", exception.getMessage());
+        verify(repository).findById(99L);
     }
 }
