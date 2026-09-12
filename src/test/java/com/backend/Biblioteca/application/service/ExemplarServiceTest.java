@@ -157,6 +157,20 @@ public class ExemplarServiceTest {
         verify(livroRepository).findById(99L);
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveAtualizarStatusComSucesso() {
+        Livro livro = criarLivro(1L, "Fundação");
+        Exemplar exemplar = criarExemplar(1L, livro, StatusExemplar.DISPONIVEL);
 
+        when(repository.findById(1L)).thenReturn(Optional.of(exemplar));
+        when(repository.save(any(Exemplar.class))).thenReturn(exemplar);
+
+        ExemplarResponseDTO resultado = service.atualizarStatus(1L, StatusExemplar.EMPRESTADO);
+
+        assertEquals(StatusExemplar.EMPRESTADO, resultado.status());
+
+        verify(repository).findById(1L);
+        verify(repository).save(argThat(e -> e.getStatus() == StatusExemplar.EMPRESTADO));
+    }
 
 }
