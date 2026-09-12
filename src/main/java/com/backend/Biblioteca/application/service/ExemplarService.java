@@ -28,7 +28,7 @@ public class ExemplarService {
         Exemplar exemplar = buscarPorEntidade(id);
         return toDTO(exemplar);
     }
-    public List<ExemplarResponseDTO> listarPorLIvro(Long livroId){
+    public List<ExemplarResponseDTO> listarPorLivro(Long livroId){
         return repository.findByLivroId(livroId).stream().map(this::toDTO).toList();
     }
     public ExemplarResponseDTO criar(ExemplarRequestDTO dto){
