@@ -1,5 +1,6 @@
 package com.backend.Biblioteca.application.service;
 
+import com.backend.Biblioteca.application.dto.request.AutorRequestDTO;
 import com.backend.Biblioteca.application.dto.response.AutorResponseDTO;
 import com.backend.Biblioteca.domain.model.Autor;
 import com.backend.Biblioteca.infrastructure.repository.AutorRepository;
@@ -13,7 +14,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -87,5 +91,33 @@ public class AutorServiceTest {
 
         assertEquals("Autor não encontrado com id: 99", exception.getMessage());
         verify(repository).findById(99L);
+    }
+    @Test
+    void deveCriarAutorComSucesso() {
+        AutorRequestDTO dto = new AutorRequestDTO(
+                "Isaac Asimov", "Escritor de ficção científica", 1920, "Americana"
+        );
+
+        when(repository.save(any(Autor.class))).thenAnswer(invocation -> {
+            Autor autorSalvo = invocation.getArgument(0);
+            autorSalvo.setId(1L);
+            return autorSalvo;
+        });
+
+        AutorResponseDTO resultado = service.criar(dto);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.id());
+        assertEquals("Isaac Asimov", resultado.nome());
+        assertEquals("Escritor de ficção científica", resultado.biografia());
+        assertEquals(1920, resultado.anoNascimento());
+        assertEquals("Americana", resultado.nacionalidade());
+
+        verify(repository).save(argThat(a ->
+                a.getNome().equals(dto.nome()) &&
+                        a.getBiografia().equals(dto.biografia()) &&
+                        a.getAnoNascimento().equals(dto.anoNascimento()) &&
+                        a.getNacionalidade().equals(dto.nacionalidade())
+        ));
     }
 }
