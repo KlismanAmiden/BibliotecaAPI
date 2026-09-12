@@ -19,9 +19,6 @@ public class Exemplar {
     @JoinColumn(name = "livro_id",nullable = false)
     private Livro livro;
 
-    @Column(nullable = false)
-    private String codigo;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)
     private StatusExemplar status = StatusExemplar.DISPONIVEL;
