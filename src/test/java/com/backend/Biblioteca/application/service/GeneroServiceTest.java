@@ -177,4 +177,15 @@ public class GeneroServiceTest {
 
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoGeneroNaoEncontradoAoAtualizar() {
+        GeneroRequestDTO dto = new GeneroRequestDTO("Ficção Científica", "Descrição nova");
+
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.atualizar(99L, dto));
+
+        verify(repository, never()).save(any());
+        verify(repository, never()).existsByNome(any());
+    }
 }
