@@ -172,5 +172,14 @@ public class ExemplarServiceTest {
         verify(repository).findById(1L);
         verify(repository).save(argThat(e -> e.getStatus() == StatusExemplar.EMPRESTADO));
     }
+    @Test
+    void deveLancarExcecaoQuandoExemplarNaoEncontradoAoAtualizarStatus() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> service.atualizarStatus(99L, StatusExemplar.EMPRESTADO));
+
+        verify(repository, never()).save(any());
+    }
 
 }
