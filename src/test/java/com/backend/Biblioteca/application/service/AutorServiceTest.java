@@ -120,4 +120,22 @@ public class AutorServiceTest {
                         a.getNacionalidade().equals(dto.nacionalidade())
         ));
     }
+
+    @Test
+    void deveAtualizarAutorComSucesso() {
+        Autor existente = criarAutor(1L, "Isaac Asimov", "Bio antiga", 1920, "Americana");
+        AutorRequestDTO dto = new AutorRequestDTO(
+                "Isaac Asimov", "Bio atualizada", 1920, "Americana"
+        );
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(repository.save(any(Autor.class))).thenReturn(existente);
+
+        AutorResponseDTO resultado = service.atualizar(1L, dto);
+
+        assertEquals("Bio atualizada", resultado.biografia());
+
+        verify(repository).findById(1L);
+        verify(repository).save(existente);
+    }
 }
