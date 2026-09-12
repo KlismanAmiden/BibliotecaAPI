@@ -188,4 +188,15 @@ public class GeneroServiceTest {
         verify(repository, never()).save(any());
         verify(repository, never()).existsByNome(any());
     }
+    @Test
+    void deveDeletarGeneroComSucesso() {
+        Genero genero = criarGenero(1L, "Ficção Científica", "Livros de ficção científica");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(genero));
+
+        service.deletar(1L);
+
+        verify(repository).findById(1L);
+        verify(repository).delete(genero);
+    }
 }
