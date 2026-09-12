@@ -143,6 +143,20 @@ public class GeneroServiceTest {
         verify(repository).save(existente);
         verify(repository, never()).existsByNome(any());
     }
+    @Test
+    void deveAtualizarGeneroTrocandoNomeSemConflito() {
+        Genero existente = criarGenero(1L, "Ficção Científica", "Descrição antiga");
+        GeneroRequestDTO dto = new GeneroRequestDTO("Ficção", "Descrição nova");
 
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(repository.existsByNome("Ficção")).thenReturn(false);
+        when(repository.save(any(Genero.class))).thenReturn(existente);
 
+        GeneroResponseDTO resultado = service.atualizar(1L, dto);
+
+        assertEquals("Ficção", resultado.nome());
+
+        verify(repository).existsByNome("Ficção");
+        verify(repository).save(existente);
+    }
 }
