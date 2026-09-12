@@ -4,6 +4,7 @@ import com.backend.Biblioteca.application.dto.request.GeneroRequestDTO;
 import com.backend.Biblioteca.application.dto.response.GeneroResponseDTO;
 import com.backend.Biblioteca.domain.model.Genero;
 import com.backend.Biblioteca.infrastructure.repository.GeneroRepository;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GeneroServiceTest {
@@ -110,5 +110,21 @@ public class GeneroServiceTest {
                 g.getNome().equals(dto.nome()) &&
                         g.getDescricao().equals(dto.descricao())
         ));
+    }
+    @Test
+    void deveLancarExcecaoQuandoNomeJaExisteAoCriar() {
+        GeneroRequestDTO dto = new GeneroRequestDTO("Ficção Científica", "Livros de ficção científica");
+
+        when(repository.existsByNome(dto.nome())).thenReturn(true);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("genero já cadastrado com Nome: Ficção Científica", exception.getMessage());
+
+        verify(repository).existsByNome(dto.nome());
+        verify(repository, never()).save(any());
     }
 }
