@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "Emprestimos")
+@Table(name = "emprestimos")
 @Getter
 @Setter
 public class Emprestimo {
@@ -19,18 +19,17 @@ public class Emprestimo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuarioId", nullable = false)
     private Usuario usuario;
 
     @ManyToMany
     @JoinTable(
-            name = ("Emprestimo-exemplar"),
+            name = ("emprestimo-exemplar"),
             joinColumns = @JoinColumn(name = "emprestimoID"),
             inverseJoinColumns = @JoinColumn( name = "exemplarId")
     )
-    private Set<Exemplar> exemplars;
+    private Set<Exemplar> exemplares;
 
     @Column(nullable = false)
     private LocalDateTime dataEmprestimo;
@@ -38,13 +37,11 @@ public class Emprestimo {
     @Column(nullable = false)
     private LocalDateTime dataPrevistaDevolucao;
 
-    @Column(nullable = false)
     private LocalDateTime dataDevolucao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)
     private StatusEmprestimo status =StatusEmprestimo.ATIVO;
 
-    @Column(nullable = false)
-    private BigDecimal multa;
+    private BigDecimal multa = BigDecimal.ZERO;
 }

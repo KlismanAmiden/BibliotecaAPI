@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "Exemplares")
 @Getter
@@ -23,6 +25,7 @@ public class Exemplar {
     @Column(name = "status",nullable = false)
     private StatusExemplar status = StatusExemplar.DISPONIVEL;
 
-
+    @ManyToMany(mappedBy = "autores")
+    private Set<Emprestimo> emprestimos;
 
 }
