@@ -35,7 +35,7 @@ public class Livro {
     @JoinTable(
             name = "livros_autores",
             joinColumns = @JoinColumn(name = "livroId"),
-            inverseJoinColumns = @JoinColumn(name = "autor_id")
+            inverseJoinColumns = @JoinColumn(name = "autorId")
     )
     private Set<Autor> autores;
 
@@ -43,7 +43,7 @@ public class Livro {
     @JoinTable(
             name = "livros_generos",
             joinColumns = @JoinColumn(name = "livroId"),
-            inverseJoinColumns = @JoinColumn(name = "genero_id")
+            inverseJoinColumns = @JoinColumn(name = "generoId")
     )
     private Set<Genero> generos;
 
