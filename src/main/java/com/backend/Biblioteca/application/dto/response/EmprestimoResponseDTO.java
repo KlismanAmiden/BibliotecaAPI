@@ -13,10 +13,10 @@ public record EmprestimoResponseDTO(
         Set<Long> exemplaresIds,
         LocalDateTime dataEmprestimo,
 
-        @JsonFormat(pattern = "dd/MM/yyyy'T'HH:mm:ss")
+        @JsonFormat(pattern = "dd/MM/yyyy'T'HH:mm")
         LocalDateTime dataPrevistaDevolucao,
 
-        @JsonFormat(pattern = "dd/MM/yyyy'T'HH:mm:ss")
+        @JsonFormat(pattern = "dd/MM/yyyy'T'HH:mm")
         LocalDateTime dataDevolucao,
 
         StatusEmprestimo status,
