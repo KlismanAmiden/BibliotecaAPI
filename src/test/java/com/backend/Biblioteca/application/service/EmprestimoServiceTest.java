@@ -209,4 +209,27 @@ public class EmprestimoServiceTest  {
         verify(repository, never()).save(any());
     }
 
+    @Test
+    void deveLancarExcecaoQuandoUsuarioAtingeLimiteDeEmprestimosAtivos() {
+        Usuario usuario = criarUsuario(1L);
+        EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().plusDays(14));
+
+        List<Emprestimo> ativos = List.of(
+                criarEmprestimo(2L, usuario, Set.of(criarExemplar(2L, StatusExemplar.EMPRESTADO)), LocalDateTime.now().plusDays(3), StatusEmprestimo.ATIVO),
+                criarEmprestimo(3L, usuario, Set.of(criarExemplar(3L, StatusExemplar.EMPRESTADO)), LocalDateTime.now().plusDays(3), StatusEmprestimo.ATIVO),
+                criarEmprestimo(4L, usuario, Set.of(criarExemplar(4L, StatusExemplar.EMPRESTADO)), LocalDateTime.now().plusDays(3), StatusEmprestimo.ATIVO)
+        );
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(ativos);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Usuário atingiu o limite de 3 empréstimos ativos", exception.getMessage());
+        verify(repository, never()).save(any());
+    }
+
 }

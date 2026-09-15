@@ -109,7 +109,7 @@ public class EmprestimoService {
             throw new BadRequestException("Usuário possui empréstimo em atraso e não pode pegar novos livros.");
         }
         if(ativos.size() >= LimiteEmprestimoLimite){
-            throw new BadRequestException("Usuario atingiu o limite de "+ LimiteEmprestimoLimite +" emprestimos ativos");
+            throw new BadRequestException("Usuário atingiu o limite de "+ LimiteEmprestimoLimite +" empréstimos ativos");
         }
     }
     private Set<Exemplar> buscarExemplaresDisponiveis(Set<Long> ids){
