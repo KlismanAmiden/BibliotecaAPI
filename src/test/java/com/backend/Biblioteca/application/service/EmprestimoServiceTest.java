@@ -117,4 +117,17 @@ public class EmprestimoServiceTest  {
 
         assertEquals("Empréstimo não encontrado com id: 99", exception.getMessage());
     }
+    @Test
+    void deveListarEmprestimosPorUsuario() {
+        Usuario usuario = criarUsuario(1L);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(criarExemplar(1L, StatusExemplar.EMPRESTADO)),
+                LocalDateTime.now().plusDays(7), StatusEmprestimo.ATIVO);
+
+        when(repository.findByUsuarioId(1L)).thenReturn(List.of(emprestimo));
+
+        List<EmprestimoResponseDTO> resultado = service.listarPorUsuario(1L);
+
+        assertEquals(1, resultado.size());
+        verify(repository).findByUsuarioId(1L);
+    }
 }
