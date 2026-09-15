@@ -284,6 +284,22 @@ public class EmprestimoServiceTest  {
         assertNotNull(response.dataDevolucao());
         verify(exemplarRepository).saveAll(Set.of(exemplar));
     }
+    @Test
+    void deveDevolverEmprestimoAtrasadoCalculandoMulta() {
+        Usuario usuario = criarUsuario(1L);
+        Exemplar exemplar = criarExemplar(1L, StatusExemplar.EMPRESTADO);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(exemplar),
+                LocalDateTime.now().minusDays(3), StatusEmprestimo.ATIVO);
 
+        when(repository.findById(1L)).thenReturn(Optional.of(emprestimo));
+        when(repository.save(any(Emprestimo.class))).thenReturn(emprestimo);
+
+        EmprestimoResponseDTO response = service.devolver(1L);
+
+        assertEquals(StatusEmprestimo.DEVOLVIDO, response.status());
+        // 3 dias de atraso + 1 = 4 dias * 2.00
+        assertEquals(0, new BigDecimal("8.00").compareTo(response.multa()));
+        assertEquals(StatusExemplar.DISPONIVEL, exemplar.getStatus());
+    }
 
 }
