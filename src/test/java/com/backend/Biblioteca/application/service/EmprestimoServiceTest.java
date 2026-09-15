@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,5 +90,18 @@ public class EmprestimoServiceTest  {
 
         assertEquals(1, resultado.size());
         verify(repository).findAll();
+    }
+    @Test
+    void deveBuscarEmprestimoPorId() {
+        Usuario usuario = criarUsuario(1L);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(criarExemplar(1L, StatusExemplar.EMPRESTADO)),
+                LocalDateTime.now().plusDays(7), StatusEmprestimo.ATIVO);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(emprestimo));
+
+        EmprestimoResponseDTO resultado = service.buscarPorId(1L);
+
+        assertEquals(1L, resultado.id());
+        assertEquals(1L, resultado.usuarioId());
     }
 }
