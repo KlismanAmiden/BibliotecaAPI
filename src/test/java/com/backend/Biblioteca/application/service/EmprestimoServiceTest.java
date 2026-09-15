@@ -231,5 +231,22 @@ public class EmprestimoServiceTest  {
         assertEquals("Usuário atingiu o limite de 3 empréstimos ativos", exception.getMessage());
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoExemplarNaoEncontradoAoCriar() {
+        Usuario usuario = criarUsuario(1L);
+        EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L, 2L), LocalDateTime.now().plusDays(14));
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
+        when(exemplarRepository.findAllById(dto.exemplaresIds())).thenReturn(List.of(criarExemplar(1L, StatusExemplar.DISPONIVEL)));
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Um ou mais exemplares não foram encontrados", exception.getMessage());
+        verify(repository, never()).save(any());
+    }
 
 }
