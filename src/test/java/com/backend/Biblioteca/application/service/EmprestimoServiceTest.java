@@ -248,5 +248,24 @@ public class EmprestimoServiceTest  {
         assertEquals("Um ou mais exemplares não foram encontrados", exception.getMessage());
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoExemplarIndisponivelAoCriar() {
+        Usuario usuario = criarUsuario(1L);
+        EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().plusDays(14));
+        Exemplar exemplarEmprestado = criarExemplar(1L, StatusExemplar.EMPRESTADO);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
+        when(exemplarRepository.findAllById(dto.exemplaresIds())).thenReturn(List.of(exemplarEmprestado));
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto)
+        );
+
+        assertTrue(exception.getMessage().contains("Exemplares indisponíveis para empréstimo"));
+        verify(repository, never()).save(any());
+    }
+
 
 }
