@@ -319,4 +319,11 @@ public class EmprestimoServiceTest  {
         verify(repository, never()).save(any());
         verifyNoInteractions(exemplarRepository);
     }
+    @Test
+    void deveLancarExcecaoQuandoEmprestimoNaoEncontradoAoDevolver() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.devolver(99L));
+        verify(repository, never()).save(any());
+    }
 }
