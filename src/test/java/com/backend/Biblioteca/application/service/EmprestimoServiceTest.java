@@ -26,8 +26,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EmprestimoServiceTest  {
@@ -157,4 +156,20 @@ public class EmprestimoServiceTest  {
         verify(exemplarRepository).saveAll(Set.of(exemplar));
         verify(repository).save(any(Emprestimo.class));
     }
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoEncontradoAoCriar() {
+        EmprestimoRequestDTO dto = criarDto(99L, Set.of(1L), LocalDateTime.now().plusDays(14));
+
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Usuário não encontrado com id: 99", exception.getMessage());
+        verifyNoInteractions(exemplarRepository);
+        verify(repository, never()).save(any());
+    }
+
 }
