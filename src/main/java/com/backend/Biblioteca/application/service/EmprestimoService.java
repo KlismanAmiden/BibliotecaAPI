@@ -98,7 +98,7 @@ public class EmprestimoService {
     }
     private Usuario buscarPorUsuario(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com id: " + id));
     }
     private void validarUsuarioSemPendencias(Long usuarioId){
 
