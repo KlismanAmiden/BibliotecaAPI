@@ -38,6 +38,4 @@ public class EmprestimoController {
     public EmprestimoResponseDTO devolver(@PathVariable Long id){
         return service.devolver(id);
     }
-
-
 }
