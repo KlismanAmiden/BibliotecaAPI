@@ -188,5 +188,25 @@ public class EmprestimoServiceTest  {
         verifyNoInteractions(exemplarRepository);
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoUsuarioTemEmprestimoEmAtraso() {
+        Usuario usuario = criarUsuario(1L);
+        EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().plusDays(14));
+
+        Emprestimo atrasado = criarEmprestimo(5L, usuario, Set.of(criarExemplar(2L, StatusExemplar.EMPRESTADO)),
+                LocalDateTime.now().minusDays(2), StatusEmprestimo.ATIVO);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of(atrasado));
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Usuário possui empréstimo em atraso e não pode pegar novos livros.", exception.getMessage());
+        verifyNoInteractions(exemplarRepository);
+        verify(repository, never()).save(any());
+    }
 
 }

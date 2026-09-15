@@ -106,7 +106,7 @@ public class EmprestimoService {
         boolean temAtraso = ativos.stream()
                 .anyMatch(e -> e.getDataPrevistaDevolucao().isBefore(LocalDateTime.now()));
         if(temAtraso){
-            throw new BadRequestException("Usuario possui emprestimo em atraso e não pode pegar novos livros");
+            throw new BadRequestException("Usuário possui empréstimo em atraso e não pode pegar novos livros.");
         }
         if(ativos.size() >= LimiteEmprestimoLimite){
             throw new BadRequestException("Usuario atingiu o limite de "+ LimiteEmprestimoLimite +" emprestimos ativos");
