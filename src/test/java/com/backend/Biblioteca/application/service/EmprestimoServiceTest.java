@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -129,5 +129,32 @@ public class EmprestimoServiceTest  {
 
         assertEquals(1, resultado.size());
         verify(repository).findByUsuarioId(1L);
+    }
+
+    @Test
+    void deveCriarEmprestimoComSucesso() {
+        Usuario usuario = criarUsuario(1L);
+        Exemplar exemplar = criarExemplar(1L, StatusExemplar.DISPONIVEL);
+        EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().plusDays(14));
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
+        when(exemplarRepository.findAllById(dto.exemplaresIds())).thenReturn(List.of(exemplar));
+        when(repository.save(any(Emprestimo.class))).thenAnswer(invocation -> {
+            Emprestimo salvo = invocation.getArgument(0);
+            salvo.setId(10L);
+            return salvo;
+        });
+
+        EmprestimoResponseDTO response = service.criar(dto);
+
+        assertNotNull(response);
+        assertEquals(10L, response.id());
+        assertEquals(StatusEmprestimo.ATIVO, response.status());
+        assertEquals(0, BigDecimal.ZERO.compareTo(response.multa()));
+        assertEquals(StatusExemplar.EMPRESTADO, exemplar.getStatus());
+
+        verify(exemplarRepository).saveAll(Set.of(exemplar));
+        verify(repository).save(any(Emprestimo.class));
     }
 }
