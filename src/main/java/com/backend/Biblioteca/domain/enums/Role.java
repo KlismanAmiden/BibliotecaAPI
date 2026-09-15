@@ -1,6 +1,6 @@
 package com.backend.Biblioteca.domain.enums;
 
-public enum Roles {
+public enum Role {
     ADMIN,
     CLIENTE,
     BIBLIOTECARIO

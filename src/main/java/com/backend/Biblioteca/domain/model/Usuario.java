@@ -1,10 +1,11 @@
 package com.backend.Biblioteca.domain.model;
 
-import java.time.LocalDateTime;
-
+import com.backend.Biblioteca.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -35,6 +36,8 @@ public class Usuario {
     @Column(nullable = false)
     private boolean ativo;
 
-    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
 }

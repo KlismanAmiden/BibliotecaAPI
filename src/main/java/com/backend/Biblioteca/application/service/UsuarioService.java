@@ -2,6 +2,7 @@ package com.backend.Biblioteca.application.service;
 
 import com.backend.Biblioteca.application.dto.request.UsuarioRequestDTO;
 import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
+import com.backend.Biblioteca.domain.enums.Role;
 import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
 import com.backend.Biblioteca.web.exception.BadRequestException;
@@ -39,6 +40,7 @@ public class UsuarioService {
         usuario.setTelefone(dto.telefone());
         usuario.setDataCadastro(LocalDateTime.now());
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        usuario.setRole(Role.CLIENTE);
         Usuario salvo = repository.save(usuario);
         return toDTO(salvo);
     }
@@ -76,7 +78,8 @@ public class UsuarioService {
                 u.getEmail(),
                 u.getTelefone(),
                 u.getDataCadastro(),
-                u.isAtivo()
+                u.isAtivo(),
+                u.getRole()
         );
     }
 
