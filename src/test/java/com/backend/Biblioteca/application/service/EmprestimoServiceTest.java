@@ -301,5 +301,22 @@ public class EmprestimoServiceTest  {
         assertEquals(0, new BigDecimal("8.00").compareTo(response.multa()));
         assertEquals(StatusExemplar.DISPONIVEL, exemplar.getStatus());
     }
+    @Test
+    void deveLancarExcecaoQuandoDevolverEmprestimoJaFinalizado() {
+        Usuario usuario = criarUsuario(1L);
+        Exemplar exemplar = criarExemplar(1L, StatusExemplar.DISPONIVEL);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(exemplar),
+                LocalDateTime.now().plusDays(2), StatusEmprestimo.DEVOLVIDO);
 
+        when(repository.findById(1L)).thenReturn(Optional.of(emprestimo));
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.devolver(1L)
+        );
+
+        assertEquals("Este empréstimo já foi finalizado.", exception.getMessage());
+        verify(repository, never()).save(any());
+        verifyNoInteractions(exemplarRepository);
+    }
 }
