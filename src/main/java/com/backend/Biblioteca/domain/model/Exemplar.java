@@ -25,7 +25,7 @@ public class Exemplar {
     @Column(name = "status",nullable = false)
     private StatusExemplar status = StatusExemplar.DISPONIVEL;
 
-    @ManyToMany(mappedBy = "autores")
+    @ManyToMany(mappedBy = "exemplares")
     private Set<Emprestimo> emprestimos;
 
 }
