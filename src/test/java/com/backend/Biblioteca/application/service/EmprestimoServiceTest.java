@@ -11,6 +11,7 @@ import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.EmprestimoRepository;
 import com.backend.Biblioteca.infrastructure.repository.ExemplarRepository;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -168,6 +169,22 @@ public class EmprestimoServiceTest  {
         );
 
         assertEquals("Usuário não encontrado com id: 99", exception.getMessage());
+        verifyNoInteractions(exemplarRepository);
+        verify(repository, never()).save(any());
+    }
+    @Test
+    void deveLancarExcecaoQuandoDataPrevistaNoPassado() {
+        Usuario usuario = criarUsuario(1L);
+        EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().minusDays(1));
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto)
+        );
+
+        assertEquals("Data Inválida, tente novamnete", exception.getMessage());
         verifyNoInteractions(exemplarRepository);
         verify(repository, never()).save(any());
     }

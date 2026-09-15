@@ -50,7 +50,7 @@ public class EmprestimoService {
         Usuario usuario = buscarPorUsuario(dto.usuarioId());
 
         if (dto.dataPrevistaDevolucao().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("data Inválida, tente novamnete");
+            throw new BadRequestException("Data Inválida, tente novamnete");
         }
         validarUsuarioSemPendencias(dto.usuarioId());
 
