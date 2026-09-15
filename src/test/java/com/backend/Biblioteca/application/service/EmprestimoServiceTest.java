@@ -266,6 +266,24 @@ public class EmprestimoServiceTest  {
         assertTrue(exception.getMessage().contains("Exemplares indisponíveis para empréstimo"));
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveDevolverEmprestimoDentroDoPrazoSemMulta() {
+        Usuario usuario = criarUsuario(1L);
+        Exemplar exemplar = criarExemplar(1L, StatusExemplar.EMPRESTADO);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(exemplar),
+                LocalDateTime.now().plusDays(2), StatusEmprestimo.ATIVO);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(emprestimo));
+        when(repository.save(any(Emprestimo.class))).thenReturn(emprestimo);
+
+        EmprestimoResponseDTO response = service.devolver(1L);
+
+        assertEquals(StatusEmprestimo.DEVOLVIDO, response.status());
+        assertEquals(0, BigDecimal.ZERO.compareTo(response.multa()));
+        assertEquals(StatusExemplar.DISPONIVEL, exemplar.getStatus());
+        assertNotNull(response.dataDevolucao());
+        verify(exemplarRepository).saveAll(Set.of(exemplar));
+    }
 
 
 }
