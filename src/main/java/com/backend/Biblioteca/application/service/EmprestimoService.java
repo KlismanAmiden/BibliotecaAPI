@@ -94,7 +94,7 @@ public class EmprestimoService {
 
     private Emprestimo buscarPorEntidade(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Emprestimo não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado com id: " + id));
     }
     private Usuario buscarPorUsuario(Long id) {
         return usuarioRepository.findById(id)

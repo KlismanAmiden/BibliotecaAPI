@@ -11,6 +11,7 @@ import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.EmprestimoRepository;
 import com.backend.Biblioteca.infrastructure.repository.ExemplarRepository;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -103,5 +105,16 @@ public class EmprestimoServiceTest  {
 
         assertEquals(1L, resultado.id());
         assertEquals(1L, resultado.usuarioId());
+    }
+    @Test
+    void deveLancarExcecaoQuandoEmprestimoNaoEncontrado() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.buscarPorId(99L)
+        );
+
+        assertEquals("Empréstimo não encontrado com id: 99", exception.getMessage());
     }
 }
