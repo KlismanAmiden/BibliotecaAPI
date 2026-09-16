@@ -6,6 +6,7 @@ import com.backend.Biblioteca.domain.enums.Role;
 import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,8 +18,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
@@ -65,4 +66,19 @@ public class AuthServiceTest {
 
         verify(jwtUtil).generateToken("kl@teste.com", 1L, "USUARIO");
     }
+    @Test
+    void deveLancarExcecaoQuandoEmailNaoEncontrado() {
+        LoginRequestDTO dto = new LoginRequestDTO("naoexiste@teste.com", "senha123");
+
+        when(repository.findByEmail("naoexiste@teste.com")).thenReturn(Optional.empty());
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.login(dto)
+        );
+
+        assertEquals("Email ou Senha inválidos", exception.getMessage());
+        verifyNoInteractions(encoder, jwtUtil);
+    }
+
 }
