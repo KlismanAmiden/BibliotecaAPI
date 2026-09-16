@@ -24,7 +24,7 @@ public class AuthService {
                 .orElseThrow(() ->
                         new BadRequestException("Email ou Senha inválidos"));
 
-        if (encoder.matches(dto.senha(), usuario.getSenha())) {
+        if (!encoder.matches(dto.senha(), usuario.getSenha())) {
             throw new BadRequestException("Email ou Senha inválidos");
         }
 
