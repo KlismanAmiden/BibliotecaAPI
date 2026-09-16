@@ -80,5 +80,20 @@ public class AuthServiceTest {
         assertEquals("Email ou Senha inválidos", exception.getMessage());
         verifyNoInteractions(encoder, jwtUtil);
     }
+    @Test
+    void deveLancarExcecaoQuandoSenhaInvalida() {
+        Usuario usuario = criarUsuario(1L, "kl@teste.com", "hashSalvo", Role.USUARIO);
+        LoginRequestDTO dto = new LoginRequestDTO("kl@teste.com", "senhaErrada");
 
+        when(repository.findByEmail("kl@teste.com")).thenReturn(Optional.of(usuario));
+        when(encoder.matches("senhaErrada", "hashSalvo")).thenReturn(false);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.login(dto)
+        );
+
+        assertEquals("Email ou Senha inválidos", exception.getMessage());
+        verifyNoInteractions(jwtUtil);
+    }
 }
