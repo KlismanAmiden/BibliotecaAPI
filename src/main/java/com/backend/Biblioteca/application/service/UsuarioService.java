@@ -40,7 +40,7 @@ public class UsuarioService {
         usuario.setTelefone(dto.telefone());
         usuario.setDataCadastro(LocalDateTime.now());
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
-        usuario.setRole(Role.CLIENTE);
+        usuario.setRole(Role.USUARIO);
         Usuario salvo = repository.save(usuario);
         return toDTO(salvo);
     }
