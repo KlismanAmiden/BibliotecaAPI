@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.EmprestimoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +19,13 @@ public class EmprestimoController {
     private final EmprestimoService service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public List<EmprestimoResponseDTO> listarTodos(){
         return service.listarTodos();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public EmprestimoResponseDTO buscarPorId(@PathVariable Long id){
         return service.buscarPorId(id);
     }
@@ -38,6 +41,7 @@ public class EmprestimoController {
     }
 
     @PatchMapping("/{Id}/devolver")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public EmprestimoResponseDTO devolver(@PathVariable Long id){
         return service.devolver(id);
     }
