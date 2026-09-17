@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -157,6 +158,42 @@ public class UsuarioServiceTest {
         assertEquals("Usuario não encontrado com id: 99", exception.getMessage());
 
         verify(repository).findById(99L);
+    }
+    @Test
+    void deveAtualizarUsuarioComSucesso() {
+
+        Usuario existente = new Usuario();
+        existente.setId(1L);
+        existente.setNome("Klisman");
+        existente.setEmail("klisman@email.com");
+        existente.setTelefone("71999999999");
+        existente.setSenha("senha-antiga");
+        existente.setDataCadastro(LocalDateTime.now());
+
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman Amiden", "klisman.novo@email.com", "novaSenha", "71988887777");
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(existente));
+        when(repository.existsByEmail(dto.email()))
+                .thenReturn(false);
+        when(passwordEncoder.encode(dto.senha()))
+                .thenReturn("senha-nova-criptografada");
+        when(repository.save(any(Usuario.class)))
+                .thenReturn(existente);
+
+        UsuarioResponseDTO response = usuarioService.atualizar(1L, dto);
+
+        assertNotNull(response);
+        assertEquals("Klisman Amiden", response.nome());
+        assertEquals("klisman.novo@email.com", response.email());
+        assertEquals("71988887777", response.telefone());
+
+        verify(repository).findById(1L);
+        verify(repository).existsByEmail(dto.email());
+        verify(passwordEncoder).encode(dto.senha());
+        verify(repository).save(argThat(u ->
+                u.getSenha().equals("senha-nova-criptografada")
+        ));
     }
 }
 
