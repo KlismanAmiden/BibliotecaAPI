@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -119,6 +120,27 @@ public class UsuarioServiceTest {
         assertEquals("71988888888", response.get(1).telefone());
 
         verify(repository).findAll();
+    }
+
+    @Test
+    void deveListarUsuarioPorIdComSucesso() {
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Klisman");
+        usuario.setEmail("klisman@email.com");
+        usuario.setTelefone("71999999999");
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+
+        UsuarioResponseDTO response = usuarioService.listarPorId(1L);
+
+        assertNotNull(response);
+        assertEquals(1L, response.id());
+        assertEquals("Klisman", response.nome());
+
+        verify(repository).findById(1L);
     }
 }
 
