@@ -4,6 +4,7 @@ import com.backend.Biblioteca.application.dto.request.UsuarioRequestDTO;
 import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
 import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -141,6 +142,21 @@ public class UsuarioServiceTest {
         assertEquals("Klisman", response.nome());
 
         verify(repository).findById(1L);
+    }
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoEncontradoPorId() {
+
+        when(repository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> usuarioService.listarPorId(99L)
+        );
+
+        assertEquals("Usuario não encontrado com id: 99", exception.getMessage());
+
+        verify(repository).findById(99L);
     }
 }
 
