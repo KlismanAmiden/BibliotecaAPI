@@ -258,5 +258,17 @@ public class UsuarioServiceTest {
 
         verify(repository, never()).save(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoEncontradoAoAtualizar() {
+
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman@email.com", "123456", "71999999999");
+
+        when(repository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> usuarioService.atualizar(99L, dto));
+
+        verify(repository, never()).save(any());
+    }
 }
 
