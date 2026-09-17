@@ -238,5 +238,25 @@ public class UsuarioServiceTest {
         assertEquals("senha-antiga", existente.getSenha());
         verify(passwordEncoder, never()).encode(any());
     }
+    @Test
+    void deveLancarExcecaoQuandoEmailJaExisteAoAtualizarParaOutroEmail() {
+
+        Usuario existente = new Usuario();
+        existente.setId(1L);
+        existente.setEmail("klisman@email.com");
+
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "outro@email.com", "123456", "71999999999");
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(existente));
+        when(repository.existsByEmail(dto.email()))
+                .thenReturn(true);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> usuarioService.atualizar(1L, dto));
+
+        assertEquals("Email já cadastrado", exception.getMessage());
+
+        verify(repository, never()).save(any());
+    }
 }
 
