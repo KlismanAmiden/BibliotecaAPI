@@ -285,5 +285,15 @@ public class UsuarioServiceTest {
         verify(repository).findById(1L);
         verify(repository).delete(usuario);
     }
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoEncontradoAoDeletar() {
+
+        when(repository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> usuarioService.deletar(99L));
+
+        verify(repository, never()).delete(any());
+    }
 }
 
