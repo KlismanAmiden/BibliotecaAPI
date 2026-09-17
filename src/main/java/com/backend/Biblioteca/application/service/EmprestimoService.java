@@ -10,6 +10,7 @@ import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.EmprestimoRepository;
 import com.backend.Biblioteca.infrastructure.repository.ExemplarRepository;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.infrastructure.security.AuthenticatedUser;
 import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,7 @@ public class EmprestimoService {
     private final EmprestimoRepository repository;
     private final UsuarioRepository usuarioRepository;
     private final ExemplarRepository exemplarRepository;
+    private final AuthenticatedUser authenticatedUser;
 
     public List<EmprestimoResponseDTO> listarTodos() {
         return repository.findAll().stream().map(this::toDTO).toList();
@@ -43,14 +45,28 @@ public class EmprestimoService {
     }
 
     public List<EmprestimoResponseDTO> listarPorUsuario(Long usuarioId) {
+
+        Usuario usuario = buscarPorUsuario(usuarioId);
+
+        boolean possuiAcessoTotal = authenticatedUser.isAdmin() || authenticatedUser.isBibliotecario();
+
+        boolean eProprioUsuario = usuario.getEmail().equals(authenticatedUser.getEmail());
+
+        if (!possuiAcessoTotal && !eProprioUsuario) {
+            throw new BadRequestException("Você só pode consultar seus próprios empréstimos.");
+        }
         return repository.findByUsuarioId(usuarioId).stream().map(this::toDTO).toList();
     }
     @Transactional
     public EmprestimoResponseDTO criar(EmprestimoRequestDTO dto){
         Usuario usuario = buscarPorUsuario(dto.usuarioId());
 
-        if (dto.dataPrevistaDevolucao().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Data Inválida, tente novamnete");
+        boolean possuiAcessoTotal = authenticatedUser.isAdmin() || authenticatedUser.isBibliotecario();
+
+        boolean eProprioUsuario = usuario.getEmail().equals(authenticatedUser.getEmail());
+
+        if (!possuiAcessoTotal && !eProprioUsuario) {
+            throw new BadRequestException("Você só pode criar empréstimos para si mesmo.");
         }
         validarUsuarioSemPendencias(dto.usuarioId());
 
