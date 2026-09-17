@@ -21,10 +21,12 @@ public class EmprestimoController {
     public List<EmprestimoResponseDTO> listarTodos(){
         return service.listarTodos();
     }
-    @GetMapping("/{Id}")
+
+    @GetMapping("/{id}")
     public EmprestimoResponseDTO buscarPorId(@PathVariable Long id){
         return service.buscarPorId(id);
     }
+
     @GetMapping("/usuario/{usuarioId}")
     public List<EmprestimoResponseDTO> listarPorUsuario(@PathVariable Long usuarioId){
         return service.listarPorUsuario(usuarioId);
@@ -34,6 +36,7 @@ public class EmprestimoController {
     public EmprestimoResponseDTO criar(@Valid @RequestBody EmprestimoRequestDTO dto) {
         return service.criar(dto);
     }
+
     @PatchMapping("/{Id}/devolver")
     public EmprestimoResponseDTO devolver(@PathVariable Long id){
         return service.devolver(id);

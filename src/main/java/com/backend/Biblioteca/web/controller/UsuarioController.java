@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class UsuarioController {
     private final UsuarioService service;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public List<UsuarioResponseDTO> listarTodos() {
         return service.ListarTodos();
     }

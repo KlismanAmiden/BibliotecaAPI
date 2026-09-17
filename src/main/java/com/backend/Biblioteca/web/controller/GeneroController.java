@@ -5,6 +5,7 @@ import com.backend.Biblioteca.application.dto.response.GeneroResponseDTO;
 import com.backend.Biblioteca.application.service.GeneroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,17 +27,20 @@ public class GeneroController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.CREATED)
     public GeneroResponseDTO criar(@RequestBody GeneroRequestDTO dto){
         return service.criar(dto);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public GeneroResponseDTO atualizar (@PathVariable long id,@RequestBody GeneroRequestDTO dto){
         return service.atualizar(id,dto);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable long id){
         service.deletar(id);

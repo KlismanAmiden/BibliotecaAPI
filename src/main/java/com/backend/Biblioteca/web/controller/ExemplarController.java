@@ -7,6 +7,7 @@ import com.backend.Biblioteca.domain.enums.StatusExemplar;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,17 +34,20 @@ public class ExemplarController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.CREATED)
     public ExemplarResponseDTO criar(@Valid @RequestBody ExemplarRequestDTO dto) {
         return service.criar(dto);
     }
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public ExemplarResponseDTO atualizarStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         StatusExemplar status = StatusExemplar.valueOf(body.get("status").toUpperCase());
         return service.atualizarStatus(id, status);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long id) {
         service.deletar(id);

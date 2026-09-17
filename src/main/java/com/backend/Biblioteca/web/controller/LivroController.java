@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.LivroService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,17 +39,20 @@ public class LivroController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.CREATED)
     public LivroResponseDTO criar(@Valid @RequestBody LivroRequestDTO dto) {
         return service.criar(dto);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public LivroResponseDTO atualizar (@PathVariable long id,@Valid @RequestBody LivroRequestDTO dto){
         return service.atualizar(id,dto);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long id) {
         service.deletar(id);
