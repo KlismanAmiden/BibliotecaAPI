@@ -170,7 +170,7 @@ public class UsuarioServiceTest {
         existente.setSenha("senha-antiga");
         existente.setDataCadastro(LocalDateTime.now());
 
-        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman Amiden", "klisman.novo@email.com", "novaSenha", "71988887777");
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman.novo@email.com", "novaSenha", "71988887777");
 
         when(repository.findById(1L))
                 .thenReturn(Optional.of(existente));
@@ -184,7 +184,7 @@ public class UsuarioServiceTest {
         UsuarioResponseDTO response = usuarioService.atualizar(1L, dto);
 
         assertNotNull(response);
-        assertEquals("Klisman Amiden", response.nome());
+        assertEquals("Klisman", response.nome());
         assertEquals("klisman.novo@email.com", response.email());
         assertEquals("71988887777", response.telefone());
 
@@ -194,6 +194,27 @@ public class UsuarioServiceTest {
         verify(repository).save(argThat(u ->
                 u.getSenha().equals("senha-nova-criptografada")
         ));
+    }
+    @Test
+    void deveAtualizarUsuarioSemTrocarEmailSemChecarDuplicidade() {
+
+        Usuario existente = new Usuario();
+        existente.setId(1L);
+        existente.setNome("Klisman");
+        existente.setEmail("klisman@email.com");
+        existente.setTelefone("71999999999");
+        existente.setSenha("senha-antiga");
+
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman@email.com", "", "71988887777");
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(existente));
+        when(repository.save(any(Usuario.class)))
+                .thenReturn(existente);
+
+        usuarioService.atualizar(1L, dto);
+
+        verify(repository, never()).existsByEmail(any());
     }
 }
 
