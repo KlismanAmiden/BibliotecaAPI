@@ -39,6 +39,8 @@ public class AutorController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletar(@PathVariable long id){}
+    public void deletar(@PathVariable long id){
+        service.deletar(id);
+    }
 
 }
