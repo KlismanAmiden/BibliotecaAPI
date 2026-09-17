@@ -216,5 +216,27 @@ public class UsuarioServiceTest {
 
         verify(repository, never()).existsByEmail(any());
     }
+    @Test
+    void deveAtualizarUsuarioSemAlterarSenhaQuandoSenhaVazia() {
+
+        Usuario existente = new Usuario();
+        existente.setId(1L);
+        existente.setNome("Klisman");
+        existente.setEmail("klisman@email.com");
+        existente.setTelefone("71999999999");
+        existente.setSenha("senha-antiga");
+
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman@email.com", "", "71988887777");
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(existente));
+        when(repository.save(any(Usuario.class)))
+                .thenReturn(existente);
+
+        usuarioService.atualizar(1L, dto);
+
+        assertEquals("senha-antiga", existente.getSenha());
+        verify(passwordEncoder, never()).encode(any());
+    }
 }
 
