@@ -270,5 +270,20 @@ public class UsuarioServiceTest {
 
         verify(repository, never()).save(any());
     }
+
+    @Test
+    void deveDeletarUsuarioComSucesso() {
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+
+        usuarioService.deletar(1L);
+
+        verify(repository).findById(1L);
+        verify(repository).delete(usuario);
+    }
 }
 
