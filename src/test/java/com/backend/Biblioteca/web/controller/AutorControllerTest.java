@@ -131,4 +131,15 @@ public class AutorControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarDeveRetornar403QuandoRoleNaoAutorizada() throws Exception {
+
+        mockMvc.perform(put("/api/autores/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(autorRequestValido())))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).atualizar(any(), any());
+    }
 }
