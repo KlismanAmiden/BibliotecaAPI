@@ -151,4 +151,14 @@ public class AutorControllerTest {
 
         verify(service).deletar(1L);
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void deletarDeveRetornar403QuandoRoleNaoAutorizada() throws Exception {
+
+        // deletar só é permitido pra ADMIN — BIBLIOTECARIO pode criar/atualizar, mas não deletar
+        mockMvc.perform(delete("/api/autores/1"))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).deletar(any());
+    }
 }
