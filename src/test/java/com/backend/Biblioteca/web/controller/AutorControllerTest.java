@@ -19,10 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AutorController.class)
 @Import(SecurityConfig.class)
@@ -120,5 +118,17 @@ public class AutorControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(service, never()).criar(any());
+    }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void atualizarDeveRetornar200QuandoAutorizado() throws Exception {
+
+        when(service.atualizar(eq(1L), any(AutorRequestDTO.class))).thenReturn(autorResponse());
+
+        mockMvc.perform(put("/api/autores/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(autorRequestValido())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
     }
 }
