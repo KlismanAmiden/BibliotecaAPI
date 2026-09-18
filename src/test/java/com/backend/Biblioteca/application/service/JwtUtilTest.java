@@ -64,4 +64,15 @@ public class JwtUtilTest {
 
         assertFalse(jwtUtil.isTokenValido("token.invalido.aqui"));
     }
+    @Test
+    void deveConsiderarTokenInvalidoQuandoAssinadoComOutraChave() {
+
+        String token = jwtUtil.generateToken("klisman@email.com", 1L, "USUARIO");
+
+        JwtUtil outroJwtUtil = new JwtUtil();
+        ReflectionTestUtils.setField(outroJwtUtil, "secret", "outra-chave-secreta-totalmente-diferente-32-bytes");
+        ReflectionTestUtils.setField(outroJwtUtil, "expirationMs", 3600000);
+
+        assertFalse(outroJwtUtil.isTokenValido(token));
+    }
 }
