@@ -142,4 +142,13 @@ public class AutorControllerTest {
 
         verify(service, never()).atualizar(any(), any());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deletarDeveRetornar204QuandoAutorizado() throws Exception {
+
+        mockMvc.perform(delete("/api/autores/1"))
+                .andExpect(status().isNoContent());
+
+        verify(service).deletar(1L);
+    }
 }
