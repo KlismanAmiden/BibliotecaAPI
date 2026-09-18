@@ -43,4 +43,11 @@ public class JwtUtilTest {
 
         assertEquals("klisman@email.com", jwtUtil.extrairEmail(token));
     }
+    @Test
+    void deveExtrairRoleCorretamenteDoToken() {
+
+        String token = jwtUtil.generateToken("klisman@email.com", 1L, "ADMIN");
+
+        assertEquals("ADMIN", jwtUtil.extrairRole(token));
+    }
 }
