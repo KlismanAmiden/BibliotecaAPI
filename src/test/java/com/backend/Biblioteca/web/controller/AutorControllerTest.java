@@ -5,6 +5,7 @@ import com.backend.Biblioteca.application.dto.response.AutorResponseDTO;
 import com.backend.Biblioteca.application.service.AutorService;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +62,15 @@ public class AutorControllerTest {
         mockMvc.perform(get("/api/autores/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
+    }
+    @Test
+    void listarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
+
+        when(service.listarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Autor não encontrado com id: 99"));
+
+        mockMvc.perform(get("/api/autores/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Autor não encontrado com id: 99"));
     }
 }
