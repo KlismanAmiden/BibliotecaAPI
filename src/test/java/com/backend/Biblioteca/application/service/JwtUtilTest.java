@@ -36,4 +36,11 @@ public class JwtUtilTest {
 
         assertTrue(jwtUtil.isTokenValido(token));
     }
+    @Test
+    void deveExtrairEmailCorretamenteDoToken() {
+
+        String token = jwtUtil.generateToken("klisman@email.com", 1L, "USUARIO");
+
+        assertEquals("klisman@email.com", jwtUtil.extrairEmail(token));
+    }
 }
