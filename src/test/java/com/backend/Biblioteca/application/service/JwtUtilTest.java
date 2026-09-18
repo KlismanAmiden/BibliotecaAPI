@@ -50,4 +50,13 @@ public class JwtUtilTest {
 
         assertEquals("ADMIN", jwtUtil.extrairRole(token));
     }
+    @Test
+    void deveConsiderarTokenInvalidoQuandoExpirado() {
+
+        ReflectionTestUtils.setField(jwtUtil, "expirationMs", -1000);
+
+        String tokenExpirado = jwtUtil.generateToken("klisman@email.com", 1L, "USUARIO");
+
+        assertFalse(jwtUtil.isTokenValido(tokenExpirado));
+    }
 }
