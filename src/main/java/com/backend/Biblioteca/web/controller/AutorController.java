@@ -3,6 +3,7 @@ package com.backend.Biblioteca.web.controller;
 import com.backend.Biblioteca.application.dto.request.AutorRequestDTO;
 import com.backend.Biblioteca.application.dto.response.AutorResponseDTO;
 import com.backend.Biblioteca.application.service.AutorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +31,7 @@ public class AutorController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.CREATED)
-    public AutorResponseDTO criar(@RequestBody AutorRequestDTO dto){
+    public AutorResponseDTO criar(@Valid @RequestBody AutorRequestDTO dto){
         return service.criar(dto);
     }
 
