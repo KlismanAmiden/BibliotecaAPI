@@ -11,16 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AutorController.class)
 @Import(SecurityConfig.class)
@@ -72,5 +71,15 @@ public class AutorControllerTest {
         mockMvc.perform(get("/api/autores/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Autor não encontrado com id: 99"));
+    }
+    @Test
+    void criarDeveRetornar401QuandoNaoAutenticado() throws Exception {
+
+        mockMvc.perform(post("/api/autores")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(autorRequestValido())))
+                .andExpect(status().isUnauthorized());
+
+        verify(service, never()).criar(any());
     }
 }
