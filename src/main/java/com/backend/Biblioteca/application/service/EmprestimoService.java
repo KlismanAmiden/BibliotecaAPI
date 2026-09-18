@@ -68,6 +68,10 @@ public class EmprestimoService {
         if (!possuiAcessoTotal && !eProprioUsuario) {
             throw new BadRequestException("Você só pode criar empréstimos para si mesmo.");
         }
+        if (dto.dataPrevistaDevolucao().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Data Inválida, tente novamnete");
+        }
+
         validarUsuarioSemPendencias(dto.usuarioId());
 
         Set<Exemplar> exemplares = buscarExemplaresDisponiveis(dto.exemplaresIds());
