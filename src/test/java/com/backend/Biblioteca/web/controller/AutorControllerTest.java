@@ -53,4 +53,13 @@ public class AutorControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nome").value("Machado de Assis"));
     }
+    @Test
+    void listarPorIdDeveSerPublicoERetornar200() throws Exception {
+
+        when(service.listarPorId(1L)).thenReturn(autorResponse());
+
+        mockMvc.perform(get("/api/autores/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+    }
 }
