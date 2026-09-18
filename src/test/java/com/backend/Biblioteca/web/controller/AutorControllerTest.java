@@ -4,12 +4,22 @@ import com.backend.Biblioteca.application.dto.request.AutorRequestDTO;
 import com.backend.Biblioteca.application.dto.response.AutorResponseDTO;
 import com.backend.Biblioteca.application.service.AutorService;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
+import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+
+
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AutorController.class)
 @Import(SecurityConfig.class)
@@ -24,11 +34,23 @@ public class AutorControllerTest {
     @MockitoBean
     private AutorService service;
 
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
     private AutorResponseDTO autorResponse() {
         return new AutorResponseDTO(1L, "Machado de Assis", "Escritor brasileiro", 1839, "Brasileira");
     }
 
     private AutorRequestDTO autorRequestValido() {
         return new AutorRequestDTO("Machado de Assis", "Escritor brasileiro", 1839, "Brasileira");
+    }
+    @Test
+    void listarTodosDeveSerPublicoERetornar200() throws Exception {
+
+        when(service.listarTodos()).thenReturn(List.of(autorResponse()));
+
+        mockMvc.perform(get("/api/autores"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Machado de Assis"));
     }
 }
