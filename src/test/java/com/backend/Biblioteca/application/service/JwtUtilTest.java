@@ -59,4 +59,9 @@ public class JwtUtilTest {
 
         assertFalse(jwtUtil.isTokenValido(tokenExpirado));
     }
+    @Test
+    void deveConsiderarTokenInvalidoQuandoMalformado() {
+
+        assertFalse(jwtUtil.isTokenValido("token.invalido.aqui"));
+    }
 }
