@@ -108,4 +108,17 @@ public class AutorControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Machado de Assis"));
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void criarDeveRetornar400QuandoDtoInvalido() throws Exception {
+
+        AutorRequestDTO dtoInvalido = new AutorRequestDTO("", "Bio", 900, "");
+
+        mockMvc.perform(post("/api/autores")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
+    }
 }
