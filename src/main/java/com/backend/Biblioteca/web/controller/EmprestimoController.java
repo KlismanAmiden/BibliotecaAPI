@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/Emprestimos")
+@RequestMapping("api/emprestimos")
 @RequiredArgsConstructor
 public class EmprestimoController {
 
@@ -40,7 +40,7 @@ public class EmprestimoController {
         return service.criar(dto);
     }
 
-    @PatchMapping("/{Id}/devolver")
+    @PatchMapping("/{id}/devolver")
     @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     public EmprestimoResponseDTO devolver(@PathVariable Long id){
         return service.devolver(id);
