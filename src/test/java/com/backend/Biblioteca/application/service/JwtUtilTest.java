@@ -3,7 +3,10 @@ package com.backend.Biblioteca.application.service;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @RequiredArgsConstructor
 public class JwtUtilTest {
@@ -16,5 +19,14 @@ public class JwtUtilTest {
         jwtUtil = new JwtUtil();
         ReflectionTestUtils.setField(jwtUtil, "secret", SECRET);
         ReflectionTestUtils.setField(jwtUtil, "expirationMs", 3600000); // 1 hora
+    }
+    @Test
+    void deveGerarTokenNaoNuloENaoVazio() {
+
+        String token = jwtUtil.generateToken("klisman@email.com", 1L, "USUARIO");
+
+        assertNotNull(token);
+        assertFalse(token.isBlank());
+        assertEquals(3, token.split("\\.").length);
     }
 }
