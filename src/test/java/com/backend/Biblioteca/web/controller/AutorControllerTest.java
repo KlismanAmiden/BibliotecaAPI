@@ -96,4 +96,16 @@ public class AutorControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void criarDeveRetornar201QuandoRoleAutorizada() throws Exception {
+
+        when(service.criar(any(AutorRequestDTO.class))).thenReturn(autorResponse());
+
+        mockMvc.perform(post("/api/autores")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(autorRequestValido())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("Machado de Assis"));
+    }
 }
