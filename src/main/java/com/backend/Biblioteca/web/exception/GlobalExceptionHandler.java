@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthorizationDenied(
+            AuthorizationDeniedException ex) {
+
+        return buildResponse(HttpStatus.FORBIDDEN, "Acesso negado.");
     }
 
     @ExceptionHandler(RuntimeException.class)

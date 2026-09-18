@@ -6,7 +6,7 @@ import com.backend.Biblioteca.application.service.AutorService;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
