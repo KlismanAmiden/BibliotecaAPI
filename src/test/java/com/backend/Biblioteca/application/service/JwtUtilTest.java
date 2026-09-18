@@ -1,6 +1,7 @@
 package com.backend.Biblioteca.application.service;
 
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,5 +75,11 @@ public class JwtUtilTest {
         ReflectionTestUtils.setField(outroJwtUtil, "expirationMs", 3600000);
 
         assertFalse(outroJwtUtil.isTokenValido(token));
+    }
+
+    @Test
+    void deveLancarExcecaoAoExtrairEmailDeTokenMalformado() {
+
+        assertThrows(JwtException.class, () -> jwtUtil.extrairEmail("token.invalido.aqui"));
     }
 }
