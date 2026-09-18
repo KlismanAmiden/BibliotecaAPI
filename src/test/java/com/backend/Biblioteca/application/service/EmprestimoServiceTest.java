@@ -11,6 +11,7 @@ import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.EmprestimoRepository;
 import com.backend.Biblioteca.infrastructure.repository.ExemplarRepository;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.infrastructure.security.AuthenticatedUser;
 import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ public class EmprestimoServiceTest  {
 
     @Mock
     private ExemplarRepository exemplarRepository;
+
+    @Mock
+    private AuthenticatedUser authenticatedUser;
 
     @InjectMocks
     private EmprestimoService service;
@@ -123,6 +127,10 @@ public class EmprestimoServiceTest  {
         Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(criarExemplar(1L, StatusExemplar.EMPRESTADO)),
                 LocalDateTime.now().plusDays(7), StatusEmprestimo.ATIVO);
 
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
+        when(authenticatedUser.getEmail()).thenReturn("kl@teste.com");
         when(repository.findByUsuarioId(1L)).thenReturn(List.of(emprestimo));
 
         List<EmprestimoResponseDTO> resultado = service.listarPorUsuario(1L);
@@ -131,6 +139,51 @@ public class EmprestimoServiceTest  {
         verify(repository).findByUsuarioId(1L);
     }
 
+    @Test void deveListarEmprestimosPorUsuarioQuandoForAdmin() {
+        Usuario usuario = criarUsuario(1L);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(criarExemplar(1L, StatusExemplar.EMPRESTADO )),
+                LocalDateTime.now().plusDays(7),StatusEmprestimo.ATIVO);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()).thenReturn(true);
+        when(repository.findByUsuarioId(1L)).thenReturn(List.of(emprestimo));
+
+        List<EmprestimoResponseDTO> resultado = service.listarPorUsuario(1L);
+
+        assertEquals(1, resultado.size());
+        verify(repository).findByUsuarioId(1L);
+    }
+
+    @Test void deveListarEmprestimosPorUsuarioQuandoForBibliotecario() {
+        Usuario usuario = criarUsuario(1L);
+        Emprestimo emprestimo = criarEmprestimo(1L, usuario, Set.of(criarExemplar(1L, StatusExemplar.EMPRESTADO )),
+                LocalDateTime.now().plusDays(7),StatusEmprestimo.ATIVO);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()) .thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(true);
+        when(repository.findByUsuarioId(1L)).thenReturn(List.of(emprestimo));
+
+        List<EmprestimoResponseDTO> resultado = service.listarPorUsuario(1L);
+
+        assertEquals(1, resultado.size());
+        verify(repository).findByUsuarioId(1L);
+    }
+    @Test void deveLancarExcecaoQuandoUsuarioConsultarEmprestimosDeOutroUsuario() {
+        Usuario usuario = criarUsuario(1L);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()) .thenReturn(false);
+        when(authenticatedUser.isBibliotecario()) .thenReturn(false);
+        when(authenticatedUser.getEmail()).thenReturn("outro@teste.com");
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.listarPorUsuario(1L) );
+
+        assertEquals("Você só pode consultar seus próprios empréstimos.", exception.getMessage());
+        verify(repository, never()).findByUsuarioId(any()); }
+
     @Test
     void deveCriarEmprestimoComSucesso() {
         Usuario usuario = criarUsuario(1L);
@@ -138,6 +191,9 @@ public class EmprestimoServiceTest  {
         EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().plusDays(14));
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
+        when(authenticatedUser.getEmail()).thenReturn("kl@teste.com");
         when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
         when(exemplarRepository.findAllById(dto.exemplaresIds())).thenReturn(List.of(exemplar));
         when(repository.save(any(Emprestimo.class))).thenAnswer(invocation -> {
@@ -156,6 +212,52 @@ public class EmprestimoServiceTest  {
 
         verify(exemplarRepository).saveAll(Set.of(exemplar));
         verify(repository).save(any(Emprestimo.class));
+    }
+    @Test void deveCriarEmprestimoQuandoForAdmin() {
+        Usuario usuario = criarUsuario(1L);
+        Exemplar exemplar = criarExemplar( 1L, StatusExemplar.DISPONIVEL );
+        EmprestimoRequestDTO dto = criarDto( 1L, Set.of(1L), LocalDateTime.now().plusDays(14) );
+
+        when(usuarioRepository.findById(1L)) .thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()) .thenReturn(true);
+        when(repository.findByUsuarioIdAndStatus( 1L, StatusEmprestimo.ATIVO )).thenReturn(List.of());
+        when(exemplarRepository.findAllById( dto.exemplaresIds() )).thenReturn(List.of(exemplar));
+        when(repository.save(any(Emprestimo.class))) .thenAnswer(invocation -> {
+            Emprestimo salvo = invocation.getArgument(0);
+            salvo.setId(10L); return salvo;
+        });
+
+        EmprestimoResponseDTO response = service.criar(dto);
+
+        assertNotNull(response);
+        assertEquals(10L, response.id());
+        assertEquals( StatusEmprestimo.ATIVO, response.status());
+
+        verify(repository) .save(any(Emprestimo.class));
+    }
+    @Test void deveCriarEmprestimoQuandoForBibliotecario() {
+        Usuario usuario = criarUsuario(1L);
+        Exemplar exemplar = criarExemplar( 1L, StatusExemplar.DISPONIVEL );
+        EmprestimoRequestDTO dto = criarDto( 1L, Set.of(1L), LocalDateTime.now().plusDays(14) );
+
+        when(usuarioRepository.findById(1L)) .thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()) .thenReturn(false);
+        when(authenticatedUser.isBibliotecario()) .thenReturn(true);
+
+        when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
+        when(exemplarRepository.findAllById( dto.exemplaresIds())).thenReturn(List.of(exemplar));
+        when(repository.save(any(Emprestimo.class))).thenAnswer(invocation -> {
+            Emprestimo salvo = invocation.getArgument(0);
+            salvo.setId(10L); return salvo;
+        });
+
+        EmprestimoResponseDTO response = service.criar(dto);
+
+        assertNotNull(response);
+        assertEquals(10L, response.id());
+        assertEquals( StatusEmprestimo.ATIVO, response.status() );
+
+        verify(repository) .save(any(Emprestimo.class));
     }
     @Test
     void deveLancarExcecaoQuandoUsuarioNaoEncontradoAoCriar() {
@@ -178,6 +280,9 @@ public class EmprestimoServiceTest  {
         EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L), LocalDateTime.now().minusDays(1));
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
+        when(authenticatedUser.getEmail()).thenReturn(usuario.getEmail());
 
         BadRequestException exception = assertThrows(
                 BadRequestException.class,
@@ -188,6 +293,24 @@ public class EmprestimoServiceTest  {
         verifyNoInteractions(exemplarRepository);
         verify(repository, never()).save(any());
     }
+    @Test void deveLancarExcecaoQuandoUsuarioTentaCriarEmprestimoParaOutroUsuario() {
+        Usuario usuario = criarUsuario(1L);
+        EmprestimoRequestDTO dto = criarDto( 1L, Set.of(1L), LocalDateTime.now().plusDays(14) );
+
+        when(usuarioRepository.findById(1L)) .thenReturn(Optional.of(usuario));
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()) .thenReturn(false);
+        when(authenticatedUser.getEmail()) .thenReturn("outro@teste.com");
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> service.criar(dto) );
+
+        assertEquals( "Você só pode criar empréstimos para si mesmo.", exception.getMessage() );
+
+        verifyNoInteractions(exemplarRepository);
+        verify(repository,never()).save(any());
+    }
     @Test
     void deveLancarExcecaoQuandoUsuarioTemEmprestimoEmAtraso() {
         Usuario usuario = criarUsuario(1L);
@@ -197,6 +320,9 @@ public class EmprestimoServiceTest  {
                 LocalDateTime.now().minusDays(2), StatusEmprestimo.ATIVO);
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn(usuario.getEmail());
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
         when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of(atrasado));
 
         BadRequestException exception = assertThrows(
@@ -221,6 +347,9 @@ public class EmprestimoServiceTest  {
         );
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn(usuario.getEmail());
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
         when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(ativos);
 
         BadRequestException exception = assertThrows(
@@ -237,6 +366,9 @@ public class EmprestimoServiceTest  {
         EmprestimoRequestDTO dto = criarDto(1L, Set.of(1L, 2L), LocalDateTime.now().plusDays(14));
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn(usuario.getEmail());
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
         when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
         when(exemplarRepository.findAllById(dto.exemplaresIds())).thenReturn(List.of(criarExemplar(1L, StatusExemplar.DISPONIVEL)));
 
@@ -255,6 +387,9 @@ public class EmprestimoServiceTest  {
         Exemplar exemplarEmprestado = criarExemplar(1L, StatusExemplar.EMPRESTADO);
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn(usuario.getEmail());
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(authenticatedUser.isBibliotecario()).thenReturn(false);
         when(repository.findByUsuarioIdAndStatus(1L, StatusEmprestimo.ATIVO)).thenReturn(List.of());
         when(exemplarRepository.findAllById(dto.exemplaresIds())).thenReturn(List.of(exemplarEmprestado));
 
