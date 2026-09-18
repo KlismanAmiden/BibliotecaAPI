@@ -29,4 +29,11 @@ public class JwtUtilTest {
         assertFalse(token.isBlank());
         assertEquals(3, token.split("\\.").length);
     }
+    @Test
+    void deveConsiderarTokenValidoQuandoDentroDoPrazo() {
+
+        String token = jwtUtil.generateToken("klisman@email.com", 1L, "USUARIO");
+
+        assertTrue(jwtUtil.isTokenValido(token));
+    }
 }
