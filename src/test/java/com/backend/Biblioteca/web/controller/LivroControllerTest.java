@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LivroController.class)
 @Import(SecurityConfig.class)
@@ -167,5 +165,15 @@ public class LivroControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void atualizarDeveRetornar200QuandoAutorizado() throws Exception {
 
+        when(service.atualizar(eq(1L), any(LivroRequestDTO.class))).thenReturn(livroResponse());
+
+        mockMvc.perform(put("/api/livros/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livroRequestValido())))
+                .andExpect(status().isOk());
+    }
 }
