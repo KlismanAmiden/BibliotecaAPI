@@ -176,4 +176,15 @@ public class LivroControllerTest {
                         .content(objectMapper.writeValueAsString(livroRequestValido())))
                 .andExpect(status().isOk());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarDeveRetornar403QuandoRoleNaoAutorizada() throws Exception {
+
+        mockMvc.perform(put("/api/livros/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livroRequestValido())))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).atualizar(any(), any());
+    }
 }
