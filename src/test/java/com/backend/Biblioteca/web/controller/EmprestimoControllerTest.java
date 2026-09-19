@@ -159,6 +159,18 @@ public class EmprestimoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("ATIVO"));
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void criarDeveRetornar400QuandoUsuarioIdNulo() throws Exception {
 
+        EmprestimoRequestDTO dtoInvalido = new EmprestimoRequestDTO(null, Set.of(1L), LocalDateTime.now().plusDays(7));
+
+        mockMvc.perform(post("/api/emprestimos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
+    }
 
 }
