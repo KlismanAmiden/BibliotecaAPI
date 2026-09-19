@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/exemplares")
+@RequestMapping("/api/exemplares")
 @RequiredArgsConstructor
 public class ExemplarController {
 
