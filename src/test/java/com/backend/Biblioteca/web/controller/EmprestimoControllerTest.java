@@ -185,5 +185,17 @@ public class EmprestimoControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void criarDeveRetornar400QuandoServiceBarraLimiteDeEmprestimos() throws Exception {
 
+        when(service.criar(any(EmprestimoRequestDTO.class)))
+                .thenThrow(new BadRequestException("Usuário atingiu o limite de 3 empréstimos ativos"));
+
+        mockMvc.perform(post("/api/emprestimos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emprestimoRequestValido())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Usuário atingiu o limite de 3 empréstimos ativos"));
+    }
 }
