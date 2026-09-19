@@ -20,7 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -86,5 +87,14 @@ public class EmprestimoControllerTest {
 
         mockMvc.perform(get("/api/emprestimos/1"))
                 .andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void buscarPorIdDeveRetornar403ParaUsuarioComum() throws Exception {
+
+        mockMvc.perform(get("/api/emprestimos/1"))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).buscarPorId(any());
     }
 }
