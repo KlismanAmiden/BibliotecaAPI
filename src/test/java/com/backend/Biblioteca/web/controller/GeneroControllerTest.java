@@ -5,6 +5,7 @@ import com.backend.Biblioteca.application.dto.response.GeneroResponseDTO;
 import com.backend.Biblioteca.application.service.GeneroService;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -51,6 +52,15 @@ public class GeneroControllerTest {
         mockMvc.perform(get("/api/generos"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nome").value("Romance"));
+    }
+    @Test
+    void listarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
+
+        when(service.listarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Genero não encontrado com id: 99"));
+
+        mockMvc.perform(get("/api/generos/99"))
+                .andExpect(status().isNotFound());
     }
 
 }
