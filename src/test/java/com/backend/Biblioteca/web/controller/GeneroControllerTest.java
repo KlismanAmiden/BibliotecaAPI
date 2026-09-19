@@ -21,6 +21,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -110,5 +111,16 @@ public class GeneroControllerTest {
                         .content(objectMapper.writeValueAsString(generoRequestValido())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Romance"));
+    }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void atualizarDeveRetornar200QuandoAutorizado() throws Exception {
+
+        when(service.atualizar(eq(1L), any(GeneroRequestDTO.class))).thenReturn(generoResponse());
+
+        mockMvc.perform(put("/api/generos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generoRequestValido())))
+                .andExpect(status().isOk());
     }
 }
