@@ -155,7 +155,6 @@ public class AutorControllerTest {
     @WithMockUser(roles = "BIBLIOTECARIO")
     void deletarDeveRetornar403QuandoRoleNaoAutorizada() throws Exception {
 
-        // deletar só é permitido pra ADMIN — BIBLIOTECARIO pode criar/atualizar, mas não deletar
         mockMvc.perform(delete("/api/autores/1"))
                 .andExpect(status().isForbidden());
 
