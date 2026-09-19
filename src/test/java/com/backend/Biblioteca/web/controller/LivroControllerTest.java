@@ -187,4 +187,14 @@ public class LivroControllerTest {
 
         verify(service, never()).atualizar(any(), any());
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deletarDeveRetornar204QuandoAdmin() throws Exception {
+
+        mockMvc.perform(delete("/api/livros/1"))
+                .andExpect(status().isNoContent());
+
+        verify(service).deletar(1L);
+    }
 }
