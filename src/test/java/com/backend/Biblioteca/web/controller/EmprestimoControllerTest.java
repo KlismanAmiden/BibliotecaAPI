@@ -114,5 +114,14 @@ public class EmprestimoControllerTest {
         mockMvc.perform(get("/api/emprestimos/usuario/1"))
                 .andExpect(status().isUnauthorized());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarPorUsuarioDeveRetornar200ParaQualquerAutenticado() throws Exception {
+
+        when(service.listarPorUsuario(1L)).thenReturn(List.of(emprestimoResponse()));
+
+        mockMvc.perform(get("/api/emprestimos/usuario/1"))
+                .andExpect(status().isOk());
+    }
 
 }
