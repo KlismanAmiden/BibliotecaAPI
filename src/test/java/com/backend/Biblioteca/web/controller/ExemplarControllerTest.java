@@ -72,5 +72,14 @@ public class ExemplarControllerTest {
         mockMvc.perform(get("/api/exemplares/99"))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    void buscarPorLivroDeveSerPublico() throws Exception {
+
+        when(service.listarPorLivro(1L)).thenReturn(List.of(exemplarResponse()));
+
+        mockMvc.perform(get("/api/exemplares/livro/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].livroId").value(1L));
+    }
 
 }
