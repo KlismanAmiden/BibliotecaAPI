@@ -123,4 +123,17 @@ public class GeneroControllerTest {
                         .content(objectMapper.writeValueAsString(generoRequestValido())))
                 .andExpect(status().isOk());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void atualizarDeveRetornar400QuandoDtoInvalido() throws Exception {
+
+        GeneroRequestDTO dtoInvalido = new GeneroRequestDTO("", "");
+
+        mockMvc.perform(put("/api/generos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).atualizar(any(), any());
+    }
 }
