@@ -135,5 +135,21 @@ public class LivroControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.titulo").value("Dom Casmurro"));
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void criarDeveRetornar400QuandoAutoresOuGenerosVazios() throws Exception {
+
+        LivroRequestDTO dtoInvalido = new LivroRequestDTO(
+                "Dom Casmurro", "978-85-359-0277-0", 1899, "desc", "Editora XPTO",
+                Set.of(), Set.of()
+        );
+
+        mockMvc.perform(post("/api/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
+    }
 
 }
