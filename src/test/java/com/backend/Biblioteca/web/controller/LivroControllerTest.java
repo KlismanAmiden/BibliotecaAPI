@@ -123,5 +123,17 @@ public class LivroControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void criarDeveRetornar201QuandoAutorizado() throws Exception {
+
+        when(service.criar(any(LivroRequestDTO.class))).thenReturn(livroResponse());
+
+        mockMvc.perform(post("/api/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livroRequestValido())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.titulo").value("Dom Casmurro"));
+    }
 
 }
