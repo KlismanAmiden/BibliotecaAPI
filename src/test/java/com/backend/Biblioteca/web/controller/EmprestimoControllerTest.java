@@ -206,4 +206,13 @@ public class EmprestimoControllerTest {
         mockMvc.perform(patch("/api/emprestimos/1/devolver"))
                 .andExpect(status().isOk());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void devolverDeveRetornar403ParaUsuarioComum() throws Exception {
+
+        mockMvc.perform(patch("/api/emprestimos/1/devolver"))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).devolver(any());
+    }
 }
