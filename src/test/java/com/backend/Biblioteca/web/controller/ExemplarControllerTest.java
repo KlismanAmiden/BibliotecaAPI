@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.ExemplarService;
 import com.backend.Biblioteca.domain.enums.StatusExemplar;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -60,6 +61,16 @@ public class ExemplarControllerTest {
         mockMvc.perform(get("/api/exemplares"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].status").value("DISPONIVEL"));
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void buscarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
+
+        when(service.listarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Exemplar não encontrado com id: 99"));
+
+        mockMvc.perform(get("/api/exemplares/99"))
+                .andExpect(status().isNotFound());
     }
 
 }
