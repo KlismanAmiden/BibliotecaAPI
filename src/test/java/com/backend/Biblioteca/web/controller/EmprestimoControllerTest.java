@@ -25,8 +25,7 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -197,5 +196,14 @@ public class EmprestimoControllerTest {
                         .content(objectMapper.writeValueAsString(emprestimoRequestValido())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Usuário atingiu o limite de 3 empréstimos ativos"));
+    }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void devolverDeveRetornar200ParaBibliotecario() throws Exception {
+
+        when(service.devolver(1L)).thenReturn(emprestimoResponse());
+
+        mockMvc.perform(patch("/api/emprestimos/1/devolver"))
+                .andExpect(status().isOk());
     }
 }
