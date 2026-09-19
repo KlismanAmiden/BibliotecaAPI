@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.EmprestimoService;
 import com.backend.Biblioteca.domain.enums.StatusEmprestimo;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +123,17 @@ public class EmprestimoControllerTest {
 
         mockMvc.perform(get("/api/emprestimos/usuario/1"))
                 .andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarPorUsuarioDeveRetornar400QuandoRegraDeNegocioBarrar() throws Exception {
+
+        when(service.listarPorUsuario(2L))
+                .thenThrow(new BadRequestException("Você só pode consultar seus próprios empréstimos."));
+
+        mockMvc.perform(get("/api/emprestimos/usuario/2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Você só pode consultar seus próprios empréstimos."));
     }
 
 }
