@@ -116,5 +116,18 @@ public class ExemplarControllerTest {
                         .content(objectMapper.writeValueAsString(exemplarRequestValido())))
                 .andExpect(status().isCreated());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void criarDeveRetornar400QuandoLivroIdNulo() throws Exception {
+
+        ExemplarRequestDTO dtoInvalido = new ExemplarRequestDTO(null);
+
+        mockMvc.perform(post("/api/exemplares")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
+    }
 
 }
