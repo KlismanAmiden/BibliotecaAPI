@@ -164,5 +164,16 @@ public class ExemplarControllerTest {
 
         verify(service, never()).atualizarStatus(any(), any());
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void atualizarStatusDeveRetornar500QuandoStatusAusente() throws Exception {
+
+        mockMvc.perform(patch("/api/exemplares/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of())))
+                .andExpect(status().isInternalServerError());
+
+        verify(service, never()).atualizarStatus(any(), any());
+    }
 
 }
