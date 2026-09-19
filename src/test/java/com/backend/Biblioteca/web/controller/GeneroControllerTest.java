@@ -136,4 +136,16 @@ public class GeneroControllerTest {
 
         verify(service, never()).atualizar(any(), any());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarDeveRetornar403QuandoRoleNaoAutorizada() throws Exception {
+
+        mockMvc.perform(put("/api/generos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generoRequestValido())))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).atualizar(any(), any());
+    }
+
 }
