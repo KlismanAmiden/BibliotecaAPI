@@ -105,4 +105,16 @@ public class ExemplarControllerTest {
         verify(service, never()).criar(any());
     }
 
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void criarDeveRetornar201ParaBibliotecario() throws Exception {
+
+        when(service.criar(any(ExemplarRequestDTO.class))).thenReturn(exemplarResponse());
+
+        mockMvc.perform(post("/api/exemplares")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exemplarRequestValido())))
+                .andExpect(status().isCreated());
+    }
+
 }
