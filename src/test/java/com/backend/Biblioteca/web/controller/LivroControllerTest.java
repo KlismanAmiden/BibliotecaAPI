@@ -79,4 +79,13 @@ public class LivroControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].autores[0].nome").value("Machado de Assis"));
     }
+    @Test
+    void buscarPorIdDeveSerPublico() throws Exception {
+
+        when(service.buscarPorId(1L)).thenReturn(livroResponse());
+
+        mockMvc.perform(get("/api/livros/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isbn").value("978-85-359-0277-0"));
+    }
 }
