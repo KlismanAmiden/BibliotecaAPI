@@ -99,4 +99,16 @@ public class GeneroControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void criarDeveRetornar201QuandoAutorizado() throws Exception {
+
+        when(service.criar(any(GeneroRequestDTO.class))).thenReturn(generoResponse());
+
+        mockMvc.perform(post("/api/generos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generoRequestValido())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("Romance"));
+    }
 }
