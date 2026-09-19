@@ -176,4 +176,14 @@ public class ExemplarControllerTest {
         verify(service, never()).atualizarStatus(any(), any());
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deletarDeveRetornar204QuandoAdmin() throws Exception {
+
+        mockMvc.perform(delete("/api/exemplares/1"))
+                .andExpect(status().isNoContent());
+
+        verify(service).deletar(1L);
+    }
+
 }
