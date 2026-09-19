@@ -78,4 +78,13 @@ public class EmprestimoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L));
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void buscarPorIdDeveRetornar200ParaAdmin() throws Exception {
+
+        when(service.buscarPorId(1L)).thenReturn(emprestimoResponse());
+
+        mockMvc.perform(get("/api/emprestimos/1"))
+                .andExpect(status().isOk());
+    }
 }
