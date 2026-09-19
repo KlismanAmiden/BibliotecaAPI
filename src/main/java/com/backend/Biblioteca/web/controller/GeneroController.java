@@ -36,7 +36,7 @@ public class GeneroController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
-    public GeneroResponseDTO atualizar (@Valid @PathVariable long id,@RequestBody GeneroRequestDTO dto){
+    public GeneroResponseDTO atualizar (@PathVariable long id,@Valid @RequestBody GeneroRequestDTO dto){
         return service.atualizar(id,dto);
     }
 
