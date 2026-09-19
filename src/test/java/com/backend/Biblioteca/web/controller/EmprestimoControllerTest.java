@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.EmprestimoService;
 import com.backend.Biblioteca.domain.enums.StatusEmprestimo;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -96,5 +97,15 @@ public class EmprestimoControllerTest {
                 .andExpect(status().isForbidden());
 
         verify(service, never()).buscarPorId(any());
+    }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void buscarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
+
+        when(service.buscarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Empréstimo não encontrado com id: 99"));
+
+        mockMvc.perform(get("/api/emprestimos/99"))
+                .andExpect(status().isNotFound());
     }
 }
