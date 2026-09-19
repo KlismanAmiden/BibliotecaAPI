@@ -151,5 +151,21 @@ public class LivroControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void criarDeveRetornar400QuandoAnoForaDoIntervalo() throws Exception {
+
+        LivroRequestDTO dtoInvalido = new LivroRequestDTO(
+                "Dom Casmurro", "978-85-359-0277-0", 2100, "desc", "Editora XPTO",
+                Set.of(1L), Set.of(1L)
+        );
+
+        mockMvc.perform(post("/api/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
+    }
 
 }
