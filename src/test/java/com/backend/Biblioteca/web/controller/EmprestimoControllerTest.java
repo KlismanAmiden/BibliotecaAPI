@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +26,7 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -134,6 +136,16 @@ public class EmprestimoControllerTest {
         mockMvc.perform(get("/api/emprestimos/usuario/2"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Você só pode consultar seus próprios empréstimos."));
+    }
+    @Test
+    void criarDeveRetornar401QuandoNaoAutenticado() throws Exception {
+
+        mockMvc.perform(post("/api/emprestimos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emprestimoRequestValido())))
+                .andExpect(status().isUnauthorized());
+
+        verify(service, never()).criar(any());
     }
 
 }
