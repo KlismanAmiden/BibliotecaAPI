@@ -108,4 +108,11 @@ public class EmprestimoControllerTest {
         mockMvc.perform(get("/api/emprestimos/99"))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    void listarPorUsuarioDeveRetornar401QuandoNaoAutenticado() throws Exception {
+
+        mockMvc.perform(get("/api/emprestimos/usuario/1"))
+                .andExpect(status().isUnauthorized());
+    }
+
 }
