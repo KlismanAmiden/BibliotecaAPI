@@ -10,16 +10,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @WebMvcTest(GeneroController.class)
 @Import(SecurityConfig.class)
@@ -73,5 +75,14 @@ public class GeneroControllerTest {
         mockMvc.perform(get("/api/generos/99"))
                 .andExpect(status().isNotFound());
     }
+    @Test
+    void criarDeveRetornar401QuandoNaoAutenticado() throws Exception {
 
+        mockMvc.perform(post("/api/generos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generoRequestValido())))
+                .andExpect(status().isUnauthorized());
+
+        verify(service, never()).criar(any());
+    }
 }
