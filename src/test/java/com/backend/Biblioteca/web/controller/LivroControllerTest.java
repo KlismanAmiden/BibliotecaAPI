@@ -61,4 +61,13 @@ public class LivroControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].titulo").value("Dom Casmurro"));
     }
+    @Test
+    void listarPorGeneroDeveSerPublico() throws Exception {
+
+        when(service.listarPorGenero(1L)).thenReturn(List.of(livroResponse()));
+
+        mockMvc.perform(get("/api/livros/genero/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].generos[0].nome").value("Romance"));
+    }
 }
