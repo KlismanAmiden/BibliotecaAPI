@@ -93,5 +93,16 @@ public class ExemplarControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void criarDeveRetornar403ParaUsuarioComum() throws Exception {
+
+        mockMvc.perform(post("/api/exemplares")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exemplarRequestValido())))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).criar(any());
+    }
 
 }
