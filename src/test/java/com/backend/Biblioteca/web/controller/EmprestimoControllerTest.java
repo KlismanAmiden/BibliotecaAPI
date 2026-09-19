@@ -172,5 +172,18 @@ public class EmprestimoControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void criarDeveRetornar400QuandoDataPrevistaDevolucaoNula() throws Exception {
+
+        EmprestimoRequestDTO dtoInvalido = new EmprestimoRequestDTO(1L, Set.of(1L), null);
+
+        mockMvc.perform(post("/api/emprestimos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
+    }
 
 }
