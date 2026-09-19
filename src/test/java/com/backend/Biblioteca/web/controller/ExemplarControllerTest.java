@@ -153,5 +153,16 @@ public class ExemplarControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("EMPRESTADO"));
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void atualizarStatusDeveRetornar500QuandoStatusInvalido() throws Exception {
+
+        mockMvc.perform(patch("/api/exemplares/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("status", "NAO_EXISTE"))))
+                .andExpect(status().isInternalServerError());
+
+        verify(service, never()).atualizarStatus(any(), any());
+    }
 
 }
