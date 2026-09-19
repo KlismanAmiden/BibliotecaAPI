@@ -155,23 +155,23 @@ public class ExemplarControllerTest {
     }
     @Test
     @WithMockUser(roles = "BIBLIOTECARIO")
-    void atualizarStatusDeveRetornar500QuandoStatusInvalido() throws Exception {
+    void atualizarStatusDeveRetornar400QuandoStatusInvalido() throws Exception {
 
         mockMvc.perform(patch("/api/exemplares/1/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of("status", "NAO_EXISTE"))))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
 
         verify(service, never()).atualizarStatus(any(), any());
     }
     @Test
     @WithMockUser(roles = "BIBLIOTECARIO")
-    void atualizarStatusDeveRetornar500QuandoStatusAusente() throws Exception {
+    void atualizarStatusDeveRetornar400QuandoStatusAusente() throws Exception {
 
         mockMvc.perform(patch("/api/exemplares/1/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of())))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
 
         verify(service, never()).atualizarStatus(any(), any());
     }
