@@ -10,12 +10,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ExemplarControllerTest.class)
 @Import(SecurityConfig.class)
@@ -46,4 +51,15 @@ public class ExemplarControllerTest {
         mockMvc.perform(get("/api/exemplares"))
                 .andExpect(status().isUnauthorized());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarTodosDeveRetornar200QuandoAutenticado() throws Exception {
+
+        when(service.listarTodos()).thenReturn(List.of(exemplarResponse()));
+
+        mockMvc.perform(get("/api/exemplares"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status").value("DISPONIVEL"));
+    }
+
 }
