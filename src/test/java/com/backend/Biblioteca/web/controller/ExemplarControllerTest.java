@@ -140,5 +140,18 @@ public class ExemplarControllerTest {
 
         verify(service, never()).atualizarStatus(any(), any());
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void atualizarStatusDeveRetornar200QuandoStatusValido() throws Exception {
+
+        when(service.atualizarStatus(eq(1L), eq(StatusExemplar.EMPRESTADO)))
+                .thenReturn(new ExemplarResponseDTO(1L, 1L, StatusExemplar.EMPRESTADO));
+
+        mockMvc.perform(patch("/api/exemplares/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("status", "emprestado"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("EMPRESTADO"));
+    }
 
 }
