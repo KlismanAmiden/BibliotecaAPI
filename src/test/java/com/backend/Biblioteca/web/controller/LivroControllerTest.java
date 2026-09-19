@@ -7,6 +7,7 @@ import com.backend.Biblioteca.application.dto.response.LivroResponseDTO;
 import com.backend.Biblioteca.application.service.LivroService;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -19,8 +20,9 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LivroController.class)
 @Import(SecurityConfig.class)
@@ -87,5 +89,14 @@ public class LivroControllerTest {
         mockMvc.perform(get("/api/livros/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isbn").value("978-85-359-0277-0"));
+    }
+    @Test
+    void buscarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
+
+        when(service.buscarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Livro não encontrado com id: 99"));
+
+        mockMvc.perform(get("/api/livros/99"))
+                .andExpect(status().isNotFound());
     }
 }
