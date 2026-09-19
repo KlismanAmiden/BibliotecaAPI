@@ -215,4 +215,16 @@ public class EmprestimoControllerTest {
 
         verify(service, never()).devolver(any());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void devolverDeveRetornar400QuandoJaFinalizado() throws Exception {
+
+        when(service.devolver(1L))
+                .thenThrow(new BadRequestException("Este empréstimo já foi finalizado."));
+
+        mockMvc.perform(patch("/api/emprestimos/1/devolver"))
+                .andExpect(status().isBadRequest());
+    }
+}
+
 }
