@@ -3,6 +3,7 @@ package com.backend.Biblioteca.web.controller;
 import com.backend.Biblioteca.application.dto.request.GeneroRequestDTO;
 import com.backend.Biblioteca.application.dto.response.GeneroResponseDTO;
 import com.backend.Biblioteca.application.service.GeneroService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,13 +30,13 @@ public class GeneroController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
     @ResponseStatus(HttpStatus.CREATED)
-    public GeneroResponseDTO criar(@RequestBody GeneroRequestDTO dto){
+    public GeneroResponseDTO criar(@Valid @RequestBody GeneroRequestDTO dto){
         return service.criar(dto);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','BIBLIOTECARIO')")
-    public GeneroResponseDTO atualizar (@PathVariable long id,@RequestBody GeneroRequestDTO dto){
+    public GeneroResponseDTO atualizar (@Valid @PathVariable long id,@RequestBody GeneroRequestDTO dto){
         return service.atualizar(id,dto);
     }
 
