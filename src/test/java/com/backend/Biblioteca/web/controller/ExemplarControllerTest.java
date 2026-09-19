@@ -185,5 +185,13 @@ public class ExemplarControllerTest {
 
         verify(service).deletar(1L);
     }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void deletarDeveRetornar403QuandoNaoForAdmin() throws Exception {
 
+        mockMvc.perform(delete("/api/exemplares/1"))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).deletar(any());
+    }
 }
