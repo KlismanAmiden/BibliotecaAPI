@@ -18,10 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -128,6 +128,17 @@ public class ExemplarControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(service, never()).criar(any());
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarStatusDeveRetornar403ParaUsuarioComum() throws Exception {
+
+        mockMvc.perform(patch("/api/exemplares/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("status", "EMPRESTADO"))))
+                .andExpect(status().isForbidden());
+
+        verify(service, never()).atualizarStatus(any(), any());
     }
 
 }
