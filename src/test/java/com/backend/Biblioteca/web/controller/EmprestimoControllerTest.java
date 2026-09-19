@@ -17,9 +17,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AutorController.class)
@@ -64,5 +67,15 @@ public class EmprestimoControllerTest {
 
         mockMvc.perform(get("/api/emprestimos"))
                 .andExpect(status().isForbidden());
+    }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void listarTodosDeveRetornar200ParaBibliotecario() throws Exception {
+
+        when(service.listarTodos()).thenReturn(List.of(emprestimoResponse()));
+
+        mockMvc.perform(get("/api/emprestimos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L));
     }
 }
