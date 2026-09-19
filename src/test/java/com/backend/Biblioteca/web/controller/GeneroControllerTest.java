@@ -53,6 +53,17 @@ public class GeneroControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nome").value("Romance"));
     }
+
+    @Test
+    void listarPorIdDeveSerPublico() throws Exception {
+
+        when(service.listarPorId(1L)).thenReturn(generoResponse());
+
+        mockMvc.perform(get("/api/generos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+    }
+
     @Test
     void listarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
 
