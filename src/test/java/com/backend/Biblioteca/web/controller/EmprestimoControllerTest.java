@@ -147,5 +147,18 @@ public class EmprestimoControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void criarDeveRetornar201ParaQualquerAutenticado() throws Exception {
+
+        when(service.criar(any(EmprestimoRequestDTO.class))).thenReturn(emprestimoResponse());
+
+        mockMvc.perform(post("/api/emprestimos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emprestimoRequestValido())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("ATIVO"));
+    }
+
 
 }
