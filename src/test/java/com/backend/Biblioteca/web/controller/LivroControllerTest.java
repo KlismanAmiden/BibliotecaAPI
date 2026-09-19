@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
@@ -21,8 +22,10 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LivroController.class)
 @Import(SecurityConfig.class)
@@ -106,6 +109,17 @@ public class LivroControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(livroRequestValido())))
                 .andExpect(status().isUnauthorized());
+
+        verify(service, never()).criar(any());
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void criarDeveRetornar403QuandoRoleNaoAutorizada() throws Exception {
+
+        mockMvc.perform(post("/api/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livroRequestValido())))
+                .andExpect(status().isForbidden());
 
         verify(service, never()).criar(any());
     }
