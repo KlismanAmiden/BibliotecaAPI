@@ -20,9 +20,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -147,5 +145,13 @@ public class GeneroControllerTest {
 
         verify(service, never()).atualizar(any(), any());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deletarDeveRetornar204QuandoAdmin() throws Exception {
 
+        mockMvc.perform(delete("/api/generos/1"))
+                .andExpect(status().isNoContent());
+
+        verify(service).deletar(1L);
+    }
 }
