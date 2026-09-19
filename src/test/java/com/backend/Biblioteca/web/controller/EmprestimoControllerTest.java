@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
@@ -18,8 +19,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AutorController.class)
 @Import(SecurityConfig.class)
@@ -56,5 +57,12 @@ public class EmprestimoControllerTest {
 
         mockMvc.perform(get("/api/emprestimos"))
                 .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarTodosDeveRetornar403ParaUsuarioComum() throws Exception {
+
+        mockMvc.perform(get("/api/emprestimos"))
+                .andExpect(status().isForbidden());
     }
 }
