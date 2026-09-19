@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AutorController.class)
+@WebMvcTest(EmprestimoController.class)
 @Import(SecurityConfig.class)
 public class EmprestimoControllerTest {
 
@@ -225,6 +225,5 @@ public class EmprestimoControllerTest {
         mockMvc.perform(patch("/api/emprestimos/1/devolver"))
                 .andExpect(status().isBadRequest());
     }
-}
 
 }
