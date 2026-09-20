@@ -6,6 +6,7 @@ import com.backend.Biblioteca.application.service.UsuarioService;
 import com.backend.Biblioteca.domain.enums.Role;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -84,5 +85,16 @@ public class UsuarioControllerTest {
 
         mockMvc.perform(get("/api/usuarios/1"))
                 .andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarPorIdDeveRetornar400QuandoNaoForOProprioNemAdmin() throws Exception {
+
+        when(service.listarPorId(2L))
+                .thenThrow(new BadRequestException("Você só pode visualizar seu próprio perfil"));
+
+        mockMvc.perform(get("/api/usuarios/2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Você só pode visualizar seu próprio perfil"));
     }
 }
