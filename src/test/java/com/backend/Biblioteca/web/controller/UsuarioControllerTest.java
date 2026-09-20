@@ -157,5 +157,16 @@ public class UsuarioControllerTest {
         verify(service, never()).atualizar(any(), any());
     }
 
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarDeveRetornar200QuandoAutenticado() throws Exception {
+
+        when(service.atualizar(eq(1L), any(UsuarioRequestDTO.class))).thenReturn(usuarioResponse());
+
+        mockMvc.perform(put("/api/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioRequestValido())))
+                .andExpect(status().isOk());
+    }
 
 }
