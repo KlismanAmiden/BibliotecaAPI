@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.RequestEntity.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -145,4 +146,16 @@ public class UsuarioControllerTest {
                         .content(objectMapper.writeValueAsString(usuarioRequestValido())))
                 .andExpect(status().isBadRequest());
     }
+    @Test
+    void atualizarDeveRetornar401QuandoNaoAutenticado() throws Exception {
+
+        mockMvc.perform(put("/api/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioRequestValido())))
+                .andExpect(status().isUnauthorized());
+
+        verify(service, never()).atualizar(any(), any());
+    }
+
+
 }
