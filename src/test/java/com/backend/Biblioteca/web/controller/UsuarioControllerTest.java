@@ -24,8 +24,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.RequestEntity.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -192,6 +191,14 @@ public class UsuarioControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(service, never()).atualizar(any(), any());
+    }
+    @Test
+    void deletarDeveRetornar401QuandoNaoAutenticado() throws Exception {
+
+        mockMvc.perform(delete("/api/usuarios/1"))
+                .andExpect(status().isUnauthorized());
+
+        verify(service, never()).deletar(any());
     }
 
 }
