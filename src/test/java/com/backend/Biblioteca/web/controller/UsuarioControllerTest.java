@@ -70,4 +70,10 @@ public class UsuarioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nome").value("Klisman"));
     }
+    @Test
+    void listarPorIdDeveRetornar401QuandoNaoAutenticado() throws Exception {
+
+        mockMvc.perform(get("/api/usuarios/1"))
+                .andExpect(status().isUnauthorized());
+    }
 }
