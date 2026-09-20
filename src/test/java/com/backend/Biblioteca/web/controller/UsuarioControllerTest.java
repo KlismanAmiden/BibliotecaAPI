@@ -168,5 +168,17 @@ public class UsuarioControllerTest {
                         .content(objectMapper.writeValueAsString(usuarioRequestValido())))
                 .andExpect(status().isOk());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarDeveRetornar400QuandoNaoForOProprioNemAdmin() throws Exception {
+
+        when(service.atualizar(eq(2L), any(UsuarioRequestDTO.class)))
+                .thenThrow(new BadRequestException("Você só pode atualizar seu proprio perfil"));
+
+        mockMvc.perform(put("/api/usuarios/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioRequestValido())))
+                .andExpect(status().isBadRequest());
+    }
 
 }
