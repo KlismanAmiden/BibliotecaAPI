@@ -7,6 +7,7 @@ import com.backend.Biblioteca.domain.enums.Role;
 import com.backend.Biblioteca.infrastructure.config.SecurityConfig;
 import com.backend.Biblioteca.infrastructure.security.JwtUtil;
 import com.backend.Biblioteca.web.exception.BadRequestException;
+import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -96,5 +97,15 @@ public class UsuarioControllerTest {
         mockMvc.perform(get("/api/usuarios/2"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Você só pode visualizar seu próprio perfil"));
+    }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarPorIdDeveRetornar404QuandoNaoEncontrado() throws Exception {
+
+        when(service.listarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Usuario não encontrado com id: 99"));
+
+        mockMvc.perform(get("/api/usuarios/99"))
+                .andExpect(status().isNotFound());
     }
 }
