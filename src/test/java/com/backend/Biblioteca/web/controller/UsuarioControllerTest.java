@@ -16,8 +16,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UsuarioController.class)
@@ -56,5 +59,15 @@ public class UsuarioControllerTest {
 
         mockMvc.perform(get("/api/usuarios"))
                 .andExpect(status().isForbidden());
+    }
+    @Test
+    @WithMockUser(roles = "BIBLIOTECARIO")
+    void listarTodosDeveRetornar200ParaBibliotecario() throws Exception {
+
+        when(service.ListarTodos()).thenReturn(List.of(usuarioResponse()));
+
+        mockMvc.perform(get("/api/usuarios"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Klisman"));
     }
 }
