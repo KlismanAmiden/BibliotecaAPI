@@ -134,4 +134,15 @@ public class UsuarioControllerTest {
 
         verify(service, never()).criar(any());
     }
+    @Test
+    void criarDeveRetornar400QuandoEmailJaCadastrado() throws Exception {
+
+        when(service.criar(any(UsuarioRequestDTO.class)))
+                .thenThrow(new BadRequestException("Email já cadastrado"));
+
+        mockMvc.perform(post("/api/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioRequestValido())))
+                .andExpect(status().isBadRequest());
+    }
 }
