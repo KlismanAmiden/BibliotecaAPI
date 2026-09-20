@@ -180,5 +180,18 @@ public class UsuarioControllerTest {
                         .content(objectMapper.writeValueAsString(usuarioRequestValido())))
                 .andExpect(status().isBadRequest());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void atualizarDeveRetornar400QuandoDtoInvalido() throws Exception {
+
+        UsuarioRequestDTO dtoInvalido = new UsuarioRequestDTO("", "klisman@email.com", "123456", "71999999999");
+
+        mockMvc.perform(put("/api/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).atualizar(any(), any());
+    }
 
 }
