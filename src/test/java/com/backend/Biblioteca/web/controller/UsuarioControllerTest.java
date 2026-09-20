@@ -76,4 +76,13 @@ public class UsuarioControllerTest {
         mockMvc.perform(get("/api/usuarios/1"))
                 .andExpect(status().isUnauthorized());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void listarPorIdDeveRetornar200ParaQualquerAutenticado() throws Exception {
+
+        when(service.listarPorId(1L)).thenReturn(usuarioResponse());
+
+        mockMvc.perform(get("/api/usuarios/1"))
+                .andExpect(status().isOk());
+    }
 }
