@@ -2,8 +2,11 @@ package com.backend.Biblioteca.application.service;
 
 import com.backend.Biblioteca.application.dto.request.UsuarioRequestDTO;
 import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
+import com.backend.Biblioteca.domain.enums.Role;
 import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.infrastructure.security.AuthenticatedUser;
+import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +31,9 @@ public class UsuarioServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuthenticatedUser authenticatedUser;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -80,7 +86,7 @@ public class UsuarioServiceTest {
         when(repository.existsByEmail(dto.email()))
                 .thenReturn(true);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> usuarioService.criar(dto));
+       BadRequestException exception = assertThrows(BadRequestException.class, () -> usuarioService.criar(dto));
 
         assertEquals("Email já cadastrado", exception.getMessage());
 
@@ -124,26 +130,70 @@ public class UsuarioServiceTest {
         verify(repository).findAll();
     }
 
-    @Test
-    void deveListarUsuarioPorIdComSucesso() {
+    @Test void deveListarUsuarioPorIdQuandoForProprioUsuario() {
 
         Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setNome("Klisman");
+        usuario.setId(1L); usuario.setNome("Klisman");
         usuario.setEmail("klisman@email.com");
         usuario.setTelefone("71999999999");
+        usuario.setRole(Role.USUARIO);
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(usuario));
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn("klisman@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
 
         UsuarioResponseDTO response = usuarioService.listarPorId(1L);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
         assertEquals("Klisman", response.nome());
+        assertEquals("klisman@email.com", response.email());
+        assertEquals(Role.USUARIO, response.role());
 
         verify(repository).findById(1L);
+        verify(authenticatedUser).getEmail();
+        verify(authenticatedUser).isAdmin();
     }
+    @Test void deveListarUsuarioPorIdQuandoForAdmin() {
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Klisman");
+        usuario.setEmail("klisman@email.com");
+        usuario.setTelefone("71999999999");
+        usuario.setRole(Role.USUARIO);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn("admin@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(true);
+
+        UsuarioResponseDTO response = usuarioService.listarPorId(1L);
+
+        assertNotNull(response); assertEquals(1L, response.id());
+        assertEquals("Klisman", response.nome());
+
+        verify(repository).findById(1L);
+        verify(authenticatedUser).getEmail();
+        verify(authenticatedUser).isAdmin();
+    }
+    @Test void deveLancarExcecaoQuandoUsuarioTentarListarOutroUsuario() {
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Klisman");
+        usuario.setEmail("klisman@email.com");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn("outro@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+
+        BadRequestException exception = assertThrows( BadRequestException.class,
+                () -> usuarioService.listarPorId(1L) );
+
+        assertEquals( "Você só pode visualizar seu próprio perfil", exception.getMessage());
+
+        verify(repository).findById(1L); }
+
     @Test
     void deveLancarExcecaoQuandoUsuarioNaoEncontradoPorId() {
 
@@ -159,8 +209,8 @@ public class UsuarioServiceTest {
 
         verify(repository).findById(99L);
     }
-    @Test
-    void deveAtualizarUsuarioComSucesso() {
+
+    @Test void deveAtualizarUsuarioComSucessoQuandoForProprioUsuario() {
 
         Usuario existente = new Usuario();
         existente.setId(1L);
@@ -168,18 +218,18 @@ public class UsuarioServiceTest {
         existente.setEmail("klisman@email.com");
         existente.setTelefone("71999999999");
         existente.setSenha("senha-antiga");
+        existente.setRole(Role.USUARIO);
         existente.setDataCadastro(LocalDateTime.now());
 
-        UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman.novo@email.com", "novaSenha", "71988887777");
+        UsuarioRequestDTO dto = new UsuarioRequestDTO( "Klisman", "klisman.novo@email.com",
+                "novaSenha", "71988887777" );
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(existente));
-        when(repository.existsByEmail(dto.email()))
-                .thenReturn(false);
-        when(passwordEncoder.encode(dto.senha()))
-                .thenReturn("senha-nova-criptografada");
-        when(repository.save(any(Usuario.class)))
-                .thenReturn(existente);
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(authenticatedUser.getEmail()).thenReturn("klisman@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(repository.existsByEmail(dto.email())).thenReturn(false);
+        when(passwordEncoder.encode(dto.senha())).thenReturn("senha-nova-criptografada");
+        when(repository.save(any(Usuario.class))).thenReturn(existente);
 
         UsuarioResponseDTO response = usuarioService.atualizar(1L, dto);
 
@@ -191,10 +241,54 @@ public class UsuarioServiceTest {
         verify(repository).findById(1L);
         verify(repository).existsByEmail(dto.email());
         verify(passwordEncoder).encode(dto.senha());
-        verify(repository).save(argThat(u ->
-                u.getSenha().equals("senha-nova-criptografada")
-        ));
+        verify(repository).save(argThat(u -> u.getSenha().equals("senha-nova-criptografada") ));
     }
+
+    @Test void deveAtualizarUsuarioComSucessoQuandoForAdmin() {
+
+        Usuario existente = new Usuario();
+        existente.setId(1L);
+        existente.setNome("Klisman");
+        existente.setEmail("klisman@email.com");
+        existente.setTelefone("71999999999");
+        existente.setSenha("senha-antiga");
+        existente.setRole(Role.USUARIO);
+
+        UsuarioRequestDTO dto = new UsuarioRequestDTO( "Klisman", "klisman.novo@email.com",
+                "novaSenha", "71988887777" );
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(authenticatedUser.getEmail()).thenReturn("admin@email.com");
+        when(authenticatedUser.isAdmin()) .thenReturn(true);
+        when(repository.existsByEmail(dto.email())).thenReturn(false);
+        when(passwordEncoder.encode(dto.senha())).thenReturn("senha-nova-criptografada");
+        when(repository.save(any(Usuario.class))).thenReturn(existente);
+
+        UsuarioResponseDTO response = usuarioService.atualizar(1L, dto);
+        assertNotNull(response); verify(repository).save(any(Usuario.class));
+    }
+    @Test void deveLancarExcecaoQuandoUsuarioTentarAtualizarOutroUsuario() {
+
+        Usuario existente = new Usuario();
+        existente.setId(1L);
+        existente.setNome("Klisman");
+        existente.setEmail("klisman@email.com");
+        UsuarioRequestDTO dto = new UsuarioRequestDTO( "Klisman", "novo@email.com",
+                "123456", "71999999999" );
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(authenticatedUser.getEmail()).thenReturn("outro@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class, () -> usuarioService.atualizar(1L, dto) );
+
+        assertEquals( "Você só pode atualizar seu proprio perfil", exception.getMessage());
+
+        verify(repository, never()).save(any());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
     @Test
     void deveAtualizarUsuarioSemTrocarEmailSemChecarDuplicidade() {
 
@@ -207,10 +301,10 @@ public class UsuarioServiceTest {
 
         UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman@email.com", "", "71988887777");
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(existente));
-        when(repository.save(any(Usuario.class)))
-                .thenReturn(existente);
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(authenticatedUser.getEmail()).thenReturn("klisman@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(repository.save(any(Usuario.class))).thenReturn(existente);
 
         usuarioService.atualizar(1L, dto);
 
@@ -228,10 +322,10 @@ public class UsuarioServiceTest {
 
         UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "klisman@email.com", "", "71988887777");
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(existente));
-        when(repository.save(any(Usuario.class)))
-                .thenReturn(existente);
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(authenticatedUser.getEmail()).thenReturn("klisman@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(repository.save(any(Usuario.class))).thenReturn(existente);
 
         usuarioService.atualizar(1L, dto);
 
@@ -247,12 +341,13 @@ public class UsuarioServiceTest {
 
         UsuarioRequestDTO dto = new UsuarioRequestDTO("Klisman", "outro@email.com", "123456", "71999999999");
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(existente));
-        when(repository.existsByEmail(dto.email()))
-                .thenReturn(true);
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(authenticatedUser.getEmail()).thenReturn("klisman@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+        when(repository.existsByEmail(dto.email())).thenReturn(true);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> usuarioService.atualizar(1L, dto));
+        BadRequestException exception = assertThrows(
+                BadRequestException.class, () -> usuarioService.atualizar(1L, dto));
 
         assertEquals("Email já cadastrado", exception.getMessage());
 
@@ -271,19 +366,50 @@ public class UsuarioServiceTest {
         verify(repository, never()).save(any());
     }
 
-    @Test
-    void deveDeletarUsuarioComSucesso() {
+    @Test void deveDeletarUsuarioComSucessoQuandoForProprioUsuario() {
 
         Usuario usuario = new Usuario();
         usuario.setId(1L);
+        usuario.setEmail("klisman@email.com");
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(usuario));
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn("klisman@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
 
         usuarioService.deletar(1L);
 
         verify(repository).findById(1L);
         verify(repository).delete(usuario);
+    }
+    @Test void deveDeletarUsuarioComSucessoQuandoForAdmin() {
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setEmail("klisman@email.com");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn("admin@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(true);
+
+        usuarioService.deletar(1L);
+        verify(repository).delete(usuario);
+    }
+    @Test void deveLancarExcecaoQuandoUsuarioTentarDeletarOutroUsuario() {
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setEmail("klisman@email.com");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(authenticatedUser.getEmail()).thenReturn("outro@email.com");
+        when(authenticatedUser.isAdmin()).thenReturn(false);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class, () -> usuarioService.deletar(1L) );
+
+        assertEquals( "Você só pode excluir seu proprio perfil", exception.getMessage());
+
+        verify(repository, never()).delete(any());
     }
     @Test
     void deveLancarExcecaoQuandoUsuarioNaoEncontradoAoDeletar() {
