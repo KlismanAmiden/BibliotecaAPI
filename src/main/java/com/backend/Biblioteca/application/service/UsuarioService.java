@@ -5,6 +5,7 @@ import com.backend.Biblioteca.application.dto.response.UsuarioResponseDTO;
 import com.backend.Biblioteca.domain.enums.Role;
 import com.backend.Biblioteca.domain.model.Usuario;
 import com.backend.Biblioteca.infrastructure.repository.UsuarioRepository;
+import com.backend.Biblioteca.infrastructure.security.AuthenticatedUser;
 import com.backend.Biblioteca.web.exception.BadRequestException;
 import com.backend.Biblioteca.web.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticatedUser authenticatedUser;
 
     public List<UsuarioResponseDTO> ListarTodos(){
         return repository.findAll().stream().map(this::toDTO).toList();
@@ -27,6 +29,12 @@ public class UsuarioService {
 
     public UsuarioResponseDTO listarPorId(Long id){
         Usuario usuario = buscarPorEntidade(id);
+        boolean eProprioUsuario =
+                usuario.getEmail().equals(authenticatedUser.getEmail());
+
+        if (!authenticatedUser.isAdmin() && !eProprioUsuario) {
+            throw new BadRequestException("Você só pode visualizar seu próprio perfil");
+        }
         return toDTO(usuario);
     }
 
@@ -47,6 +55,13 @@ public class UsuarioService {
 
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO dto){
         Usuario usuario = buscarPorEntidade(id);
+
+        boolean eProprioUsuario = usuario.getEmail().equals(authenticatedUser.getEmail());
+
+        if (!authenticatedUser.isAdmin() && !eProprioUsuario) {
+            throw new BadRequestException("Você só pode atualizar seu proprio perfil");
+        }
+
         if(!usuario.getEmail().equals(dto.email()) && repository.existsByEmail(dto.email())){
             throw new BadRequestException("Email já cadastrado");
         }
@@ -59,8 +74,15 @@ public class UsuarioService {
         Usuario salvo = repository.save(usuario);
         return toDTO(salvo);
     }
+
     public void deletar(Long id){
         Usuario usuario = buscarPorEntidade(id);
+
+        boolean eProprioUsuario = usuario.getEmail().equals(authenticatedUser.getEmail());
+
+        if (!authenticatedUser.isAdmin() && !eProprioUsuario) {
+            throw new BadRequestException("Você só pode excluir seu proprio perfil");
+        }
         repository.delete(usuario);
     }
 

@@ -19,7 +19,7 @@ public class UsuarioController {
     private final UsuarioService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize(("hasAnyRole('ADMIN','BIBLIOTECARIO')"))
     public List<UsuarioResponseDTO> listarTodos() {
         return service.ListarTodos();
     }
@@ -36,7 +36,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public UsuarioResponseDTO atualizar (@PathVariable long id, @RequestBody UsuarioRequestDTO dto){
+    public UsuarioResponseDTO atualizar (@PathVariable long id, @Valid @RequestBody UsuarioRequestDTO dto){
         return service.atualizar(id,dto);
     }
 
