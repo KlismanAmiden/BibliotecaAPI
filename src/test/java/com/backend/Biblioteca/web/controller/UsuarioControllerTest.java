@@ -209,5 +209,14 @@ public class UsuarioControllerTest {
 
         verify(service).deletar(1L);
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void deletarDeveRetornar400QuandoNaoForOProprioNemAdmin() throws Exception {
 
+        doThrow(new BadRequestException("Você só pode excluir seu proprio perfil"))
+                .when(service).deletar(2L);
+
+        mockMvc.perform(delete("/api/usuarios/2"))
+                .andExpect(status().isBadRequest());
+    }
 }
