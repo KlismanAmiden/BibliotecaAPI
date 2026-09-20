@@ -200,5 +200,14 @@ public class UsuarioControllerTest {
 
         verify(service, never()).deletar(any());
     }
+    @Test
+    @WithMockUser(roles = "USUARIO")
+    void deletarDeveRetornar204QuandoAutenticado() throws Exception {
+
+        mockMvc.perform(delete("/api/usuarios/1"))
+                .andExpect(status().isNoContent());
+
+        verify(service).deletar(1L);
+    }
 
 }
