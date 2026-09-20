@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.RequestEntity.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -121,5 +121,17 @@ public class UsuarioControllerTest {
                         .content(objectMapper.writeValueAsString(usuarioRequestValido())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Klisman"));
+    }
+    @Test
+    void criarDeveRetornar400QuandoEmailEmBranco() throws Exception {
+
+        UsuarioRequestDTO dtoInvalido = new UsuarioRequestDTO("Klisman", "", "123456", "71999999999");
+
+        mockMvc.perform(post("/api/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoInvalido)))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).criar(any());
     }
 }
