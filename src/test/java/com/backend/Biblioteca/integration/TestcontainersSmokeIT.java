@@ -2,7 +2,7 @@ package com.backend.Biblioteca.integration;
 
 import com.backend.Biblioteca.domain.model.Autor;
 import com.backend.Biblioteca.infrastructure.repository.AutorRepository;
-import infrastructure.config.TestcontainersConfiguration;
+import com.backend.Biblioteca.infrastructure.config.TestcontainersConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
