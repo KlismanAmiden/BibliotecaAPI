@@ -40,6 +40,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/livros/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/autores/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/exemplares/livro/**").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
