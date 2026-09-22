@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,6 +32,9 @@ public class Livro {
 
     @Column(nullable = false)
     private String editora;
+
+    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Exemplar> exemplares = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
