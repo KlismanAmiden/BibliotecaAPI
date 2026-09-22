@@ -16,7 +16,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Log in to Github Container Registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -28,4 +28,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/bibliotecaapi:latest
+          tags: ghcr.io/klismanamiden/bibliotecaapi:latest
