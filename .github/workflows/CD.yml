@@ -23,4 +23,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: klismanamiden/bibliotecaapi:latest
+          tags:  |
+            ${{ secrets.DOCKER_USERNAME }}/core-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/core-api:${{ github.sha }}
