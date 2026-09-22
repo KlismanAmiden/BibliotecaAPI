@@ -23,13 +23,13 @@ public class GeneroController {
     private final GeneroService service;
 
     @GetMapping
-    @Operation(summary = "Lista todos os gêneros")
+    @Operation(summary = "Lista todos os gêneros", description = "Endpoint público, não exige autenticação.")
     public List<GeneroResponseDTO> listarTodos() {
         return service.listarTodos();
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Busca um gênero pelo id")
+    @Operation(summary = "Busca um gênero pelo id", description = "Endpoint público, não exige autenticação.")
     public GeneroResponseDTO listarPorId(@PathVariable long id) {
         return service.listarPorId(id);
     }
